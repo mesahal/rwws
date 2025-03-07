@@ -123,14 +123,15 @@ export default function Home() {
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-primary hover:bg-gray-100"
+                className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
               >
                 <Link href="/donate">Donate Now</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                className="bg-white text-primary hover:bg-gray-100"
+                variant="outline"
+                className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
               >
                 <Link href="/apply-for-aid">Apply for Aid</Link>
               </Button>
@@ -313,7 +314,7 @@ export default function Home() {
             <Button
               asChild
               size="lg"
-              className="bg-white text-primary hover:bg-gray-100"
+              className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
             >
               <Link href="/donate">Donate Now</Link>
             </Button>
@@ -321,7 +322,7 @@ export default function Home() {
               asChild
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary"
+              className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
             >
               <Link href="/apply-for-aid">Apply for Aid</Link>
             </Button>
@@ -329,7 +330,7 @@ export default function Home() {
               asChild
               size="lg"
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary"
+              className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
             >
               <Link href="/contact">Contact Us</Link>
             </Button>
