@@ -1,61 +1,67 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { useToast } from '@/hooks/use-toast'
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Textarea } from "../../components/ui/textarea";
+import { useToast } from "../../hooks/use-toast";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
 export default function ContactPage() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    inquiryType: '',
-    message: '',
-    preferredContact: 'email'
-  })
+    name: "",
+    email: "",
+    phone: "",
+    inquiryType: "",
+    message: "",
+    preferredContact: "email",
+  });
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleRadioChange = (value) => {
-    setFormData(prev => ({ ...prev, preferredContact: value }))
-  }
+    setFormData((prev) => ({ ...prev, preferredContact: value }));
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // In a real app, this would send the form data to an API
     toast({
       title: "Message Sent",
       description: "Thank you for your inquiry. We'll get back to you soon.",
-    })
-    
+    });
+
     // Reset form
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      inquiryType: '',
-      message: '',
-      preferredContact: 'email'
-    })
-  }
+      name: "",
+      email: "",
+      phone: "",
+      inquiryType: "",
+      message: "",
+      preferredContact: "email",
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -63,11 +69,11 @@ export default function ContactPage() {
       <section className="relative bg-gradient-to-r from-primary to-chart-3 text-white py-16">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
-          <Image 
-            src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+          <Image
+            src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
             alt="Contact us"
             fill
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: "cover" }}
             priority
           />
         </div>
@@ -75,7 +81,8 @@ export default function ContactPage() {
           <div className="max-w-3xl">
             <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
             <p className="text-xl mb-0">
-              Have questions or want to get involved? We'd love to hear from you.
+              Have questions or want to get involved? We'd love to hear from
+              you.
             </p>
           </div>
         </div>
@@ -93,79 +100,91 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="name">Full Name</Label>
-                        <Input 
-                          id="name" 
-                          name="name" 
-                          value={formData.name} 
-                          onChange={handleChange} 
-                          required 
-                          className="mt-1" 
+                        <Input
+                          id="name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          className="mt-1"
                         />
                       </div>
                       <div>
                         <Label htmlFor="email">Email</Label>
-                        <Input 
-                          id="email" 
-                          name="email" 
-                          type="email" 
-                          value={formData.email} 
-                          onChange={handleChange} 
-                          required 
-                          className="mt-1" 
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          className="mt-1"
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="phone">Phone (Optional)</Label>
-                        <Input 
-                          id="phone" 
-                          name="phone" 
-                          value={formData.phone} 
-                          onChange={handleChange} 
-                          className="mt-1" 
+                        <Input
+                          id="phone"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="mt-1"
                         />
                       </div>
                       <div>
                         <Label htmlFor="inquiryType">Inquiry Type</Label>
-                        <Select 
-                          value={formData.inquiryType} 
-                          onValueChange={(value) => handleSelectChange('inquiryType', value)}
+                        <Select
+                          value={formData.inquiryType}
+                          onValueChange={(value) =>
+                            handleSelectChange("inquiryType", value)
+                          }
                           required
                         >
                           <SelectTrigger id="inquiryType" className="mt-1">
                             <SelectValue placeholder="Select inquiry type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="general">General Inquiry</SelectItem>
-                            <SelectItem value="donation">Donation Question</SelectItem>
-                            <SelectItem value="volunteer">Volunteer Opportunities</SelectItem>
-                            <SelectItem value="partnership">Partnership Proposal</SelectItem>
+                            <SelectItem value="general">
+                              General Inquiry
+                            </SelectItem>
+                            <SelectItem value="donation">
+                              Donation Question
+                            </SelectItem>
+                            <SelectItem value="volunteer">
+                              Volunteer Opportunities
+                            </SelectItem>
+                            <SelectItem value="partnership">
+                              Partnership Proposal
+                            </SelectItem>
                             <SelectItem value="media">Media Inquiry</SelectItem>
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="message">Message</Label>
-                      <Textarea 
-                        id="message" 
-                        name="message" 
-                        value={formData.message} 
-                        onChange={handleChange} 
-                        required 
-                        className="mt-1" 
-                        rows={5} 
+                      <Textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        className="mt-1"
+                        rows={5}
                       />
                     </div>
-                    
+
                     <div>
-                      <Label className="mb-2 block">Preferred Contact Method</Label>
-                      <RadioGroup 
-                        value={formData.preferredContact} 
+                      <Label className="mb-2 block">
+                        Preferred Contact Method
+                      </Label>
+                      <RadioGroup
+                        value={formData.preferredContact}
                         onValueChange={handleRadioChange}
                         className="flex space-x-4"
                       >
@@ -179,7 +198,7 @@ export default function ContactPage() {
                         </div>
                       </RadioGroup>
                     </div>
-                    
+
                     <Button type="submit" className="w-full">
                       <Send className="mr-2 h-4 w-4" /> Send Message
                     </Button>
@@ -187,20 +206,24 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className="space-y-6">
               {/* Contact Information */}
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+                  <h2 className="text-2xl font-bold mb-6">
+                    Contact Information
+                  </h2>
                   <div className="space-y-4">
                     <div className="flex items-start">
                       <MapPin className="h-5 w-5 text-primary mr-3 mt-0.5" />
                       <div>
                         <h3 className="font-medium">Address</h3>
                         <p className="text-muted-foreground">
-                          123 Hope Street<br />
-                          Charity City, CC 12345<br />
+                          123 Hope Street
+                          <br />
+                          Charity City, CC 12345
+                          <br />
                           United States
                         </p>
                       </div>
@@ -228,7 +251,8 @@ export default function ContactPage() {
                       <div>
                         <h3 className="font-medium">Office Hours</h3>
                         <p className="text-muted-foreground">
-                          Monday - Friday: 9:00 AM - 5:00 PM<br />
+                          Monday - Friday: 9:00 AM - 5:00 PM
+                          <br />
                           Saturday - Sunday: Closed
                         </p>
                       </div>
@@ -236,20 +260,24 @@ export default function ContactPage() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               {/* Map */}
               <Card>
                 <CardContent className="p-0">
                   <div className="relative h-64 w-full">
-                    <Image 
-                      src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" 
+                    <Image
+                      src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
                       alt="Map location"
                       fill
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: "cover" }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Button variant="default">
-                        <Link href="https://maps.google.com" target="_blank" rel="noopener noreferrer">
+                        <Link
+                          href="https://maps.google.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           View on Google Maps
                         </Link>
                       </Button>
@@ -257,29 +285,41 @@ export default function ContactPage() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               {/* Quick Links */}
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold mb-4">Quick Links</h2>
                   <ul className="space-y-2">
                     <li>
-                      <Link href="/faq" className="text-primary hover:underline">
+                      <Link
+                        href="/faq"
+                        className="text-primary hover:underline"
+                      >
                         Frequently Asked Questions
                       </Link>
                     </li>
                     <li>
-                      <Link href="/donate" className="text-primary hover:underline">
+                      <Link
+                        href="/donate"
+                        className="text-primary hover:underline"
+                      >
                         Make a Donation
                       </Link>
                     </li>
                     <li>
-                      <Link href="/apply-for-aid" className="text-primary hover:underline">
+                      <Link
+                        href="/apply-for-aid"
+                        className="text-primary hover:underline"
+                      >
                         Apply for Aid
                       </Link>
                     </li>
                     <li>
-                      <Link href="/about" className="text-primary hover:underline">
+                      <Link
+                        href="/about"
+                        className="text-primary hover:underline"
+                      >
                         About Our Organization
                       </Link>
                     </li>
@@ -295,41 +335,60 @@ export default function ContactPage() {
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
             <p className="text-lg max-w-3xl mx-auto">
-              Find quick answers to common questions about our organization and programs.
+              Find quick answers to common questions about our organization and
+              programs.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2">How can I volunteer with Hope Foundation?</h3>
+                <h3 className="text-lg font-bold mb-2">
+                  How can I volunteer with Hope Foundation?
+                </h3>
                 <p className="text-muted-foreground">
-                  We offer various volunteer opportunities both locally and internationally. Visit our volunteer page to learn about current opportunities and submit an application.
+                  We offer various volunteer opportunities both locally and
+                  internationally. Visit our volunteer page to learn about
+                  current opportunities and submit an application.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2">Is my donation tax-deductible?</h3>
+                <h3 className="text-lg font-bold mb-2">
+                  Is my donation tax-deductible?
+                </h3>
                 <p className="text-muted-foreground">
-                  Yes, Hope Foundation is a registered 501(c)(3) non-profit organization. Your donations are tax-deductible to the extent allowed by law.
+                  Yes, Hope Foundation is a registered 501(c)(3) non-profit
+                  organization. Your donations are tax-deductible to the extent
+                  allowed by law.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2">How can I apply for aid from Hope Foundation?</h3>
+                <h3 className="text-lg font-bold mb-2">
+                  How can I apply for aid from Hope Foundation?
+                </h3>
                 <p className="text-muted-foreground">
-                  You can apply for aid through our online application portal. Visit our "Apply for Aid" page to learn about eligibility requirements and submit your application.
+                  You can apply for aid through our online application portal.
+                  Visit our "Apply for Aid" page to learn about eligibility
+                  requirements and submit your application.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-2">How is my donation used?</h3>
+                <h3 className="text-lg font-bold mb-2">
+                  How is my donation used?
+                </h3>
                 <p className="text-muted-foreground">
-                  85% of donations go directly to our programs, with 10% for administrative costs and 5% for fundraising. We publish detailed financial reports annually.
+                  85% of donations go directly to our programs, with 10% for
+                  administrative costs and 5% for fundraising. We publish
+                  detailed financial reports annually.
                 </p>
               </CardContent>
             </Card>
@@ -342,5 +401,5 @@ export default function ContactPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, Heart, Sun, Moon } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -9,6 +9,11 @@ import { useTheme } from "next-themes";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -52,18 +57,21 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Button
-              onClick={toggleTheme}
-              variant="ghost"
-              size="icon"
-              className="ml-2"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+            {/* Prevent hydration error by only rendering theme toggle after mount */}
+            {mounted && (
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="icon"
+                className="ml-2"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+            )}
             <Button asChild className="ml-4" variant="default">
               <Link href="/donate">Donate Now</Link>
             </Button>
@@ -71,18 +79,21 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center">
-            <Button
-              onClick={toggleTheme}
-              variant="ghost"
-              size="icon"
-              className="mr-2"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+            {/* Prevent hydration error for mobile theme toggle */}
+            {mounted && (
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="icon"
+                className="mr-2"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
+              </Button>
+            )}
             <Button onClick={toggleMenu} variant="ghost" size="icon">
               {isOpen ? (
                 <X className="h-6 w-6" />
