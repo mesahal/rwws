@@ -16,6 +16,7 @@ import {
   Trash,
   Eye,
 } from "lucide-react";
+import AdminLayout from "../layout";
 
 // Mock data - replace with API calls
 const mockContent = {
@@ -164,48 +165,50 @@ export default function ContentManagement() {
   );
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold mb-2">Content Management</h1>
-      <p className="text-muted-foreground">
-        Manage all your website content in one place.
-      </p>
+    <AdminLayout>
+      <div className="space-y-8">
+        <h1 className="text-3xl font-bold mb-2">Content Management</h1>
+        <p className="text-muted-foreground">
+          Manage all your website content in one place.
+        </p>
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search content..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" /> Create New
+          </Button>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" /> Create New
-        </Button>
+
+        <Tabs defaultValue="blogs">
+          <TabsList>
+            <TabsTrigger value="blogs">Blogs</TabsTrigger>
+            <TabsTrigger value="news">News</TabsTrigger>
+            <TabsTrigger value="programs">Programs</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="blogs">
+            <ContentTable items={mockContent.blogs} />
+          </TabsContent>
+          <TabsContent value="news">
+            <ContentTable items={mockContent.news} />
+          </TabsContent>
+          <TabsContent value="programs">
+            <ContentTable items={mockContent.programs} />
+          </TabsContent>
+          <TabsContent value="reports">
+            <ContentTable items={mockContent.reports} />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="blogs">
-        <TabsList>
-          <TabsTrigger value="blogs">Blogs</TabsTrigger>
-          <TabsTrigger value="news">News</TabsTrigger>
-          <TabsTrigger value="programs">Programs</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="blogs">
-          <ContentTable items={mockContent.blogs} />
-        </TabsContent>
-        <TabsContent value="news">
-          <ContentTable items={mockContent.news} />
-        </TabsContent>
-        <TabsContent value="programs">
-          <ContentTable items={mockContent.programs} />
-        </TabsContent>
-        <TabsContent value="reports">
-          <ContentTable items={mockContent.reports} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    </AdminLayout>
   );
 }

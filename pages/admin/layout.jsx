@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,24 +18,19 @@ const AdminLayout = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isAdmin = localStorage.getItem("isAdmin");
-        if (!isAdmin && pathname !== "/admin/login") {
-          router.push("/admin/login");
-        } else {
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
+    const checkAuth = () => {
+      const isAdmin = localStorage.getItem("isAdmin");
+      if (!isAdmin && router.pathname !== "/admin/login") {
         router.push("/admin/login");
+      } else {
+        setIsAuthenticated(true);
       }
     };
 
     checkAuth();
-  }, [router, pathname]);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
@@ -79,9 +72,7 @@ const AdminLayout = ({ children }) => {
     },
   ];
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,11 +106,7 @@ const AdminLayout = ({ children }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground ${
-                  pathname === item.href
-                    ? "bg-accent text-accent-foreground"
-                    : ""
-                }`}
+                className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground"
               >
                 {item.icon}
                 <span className="ml-3">{item.label}</span>

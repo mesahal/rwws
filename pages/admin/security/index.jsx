@@ -18,6 +18,7 @@ import {
   Clock,
   Key,
 } from "lucide-react";
+import AdminLayout from "../layout";
 
 const mockSecurityData = {
   lastBackup: "2025-03-15 10:30 AM",
@@ -106,17 +107,19 @@ export default function SecurityManagement() {
   };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold mb-2">Security & Backups</h1>
-      <p className="text-muted-foreground">
-        Manage system security and backup settings.
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Security Metrics Cards */}
+    <AdminLayout>
+      <div className="space-y-8">
+        <h1 className="text-3xl font-bold mb-2">Security & Backups</h1>
+        <p className="text-muted-foreground">
+          Manage system security and backup settings.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Security Metrics Cards */}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Change Password & Backups Section */}
+        </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Change Password & Backups Section */}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

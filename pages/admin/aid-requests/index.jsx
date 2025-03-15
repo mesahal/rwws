@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import AdminLayout from "../layout";
 
 // Mock data - replace with API calls
 const mockRequests = [
@@ -111,127 +112,129 @@ export default function AidRequestManagement() {
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Aid Request Management</h1>
-        <p className="text-muted-foreground">
-          Review and process aid applications.
-        </p>
-      </div>
-
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search requests..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Aid Request Management</h1>
+          <p className="text-muted-foreground">
+            Review and process aid applications.
+          </p>
         </div>
-        <Button variant="outline">
-          <Filter className="h-4 w-4 mr-2" /> Advanced Filters
-        </Button>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Aid Requests</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4">Applicant</th>
-                  <th className="text-left py-3 px-4">Type</th>
-                  <th className="text-left py-3 px-4">Amount</th>
-                  <th className="text-left py-3 px-4">Status</th>
-                  <th className="text-left py-3 px-4">Urgency</th>
-                  <th className="text-left py-3 px-4">Date</th>
-                  <th className="text-right py-3 px-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((request) => (
-                  <tr key={request.id} className="border-b">
-                    <td className="py-3 px-4">
-                      <div className="font-medium">{request.name}</div>
-                    </td>
-                    <td className="py-3 px-4">{request.type}</td>
-                    <td className="py-3 px-4">${request.amount}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center">
-                        {getStatusIcon(request.status)}
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 flex-1">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search requests..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" /> Advanced Filters
+          </Button>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Aid Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4">Applicant</th>
+                    <th className="text-left py-3 px-4">Type</th>
+                    <th className="text-left py-3 px-4">Amount</th>
+                    <th className="text-left py-3 px-4">Status</th>
+                    <th className="text-left py-3 px-4">Urgency</th>
+                    <th className="text-left py-3 px-4">Date</th>
+                    <th className="text-right py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requests.map((request) => (
+                    <tr key={request.id} className="border-b">
+                      <td className="py-3 px-4">
+                        <div className="font-medium">{request.name}</div>
+                      </td>
+                      <td className="py-3 px-4">{request.type}</td>
+                      <td className="py-3 px-4">${request.amount}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center">
+                          {getStatusIcon(request.status)}
+                          <span
+                            className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(
+                              request.status
+                            )}`}
+                          >
+                            {request.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
                         <span
-                          className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(
-                            request.status
+                          className={`px-2 py-1 rounded-full text-xs ${getUrgencyColor(
+                            request.urgency
                           )}`}
                         >
-                          {request.status}
+                          {request.urgency}
                         </span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${getUrgencyColor(
-                          request.urgency
-                        )}`}
-                      >
-                        {request.urgency}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      {request.date}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                        {request.status === "Pending" && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-green-500"
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-red-500"
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">
+                        {request.date}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          {request.status === "Pending" && (
+                            <div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-green-500"
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500"
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AdminLayout>
   );
 }

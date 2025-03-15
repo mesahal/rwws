@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import AdminLayout from "./layout";
 
 // Mock data - replace with API calls
 const mockDashboardData = {
@@ -79,103 +80,109 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's what's happening with your organization.
-        </p>
-      </div>
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back! Here's what's happening with your organization.
+          </p>
+        </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-primary/10 p-2 rounded-lg">{stat.icon}</div>
-                <div
-                  className={`flex items-center ${
-                    stat.trend === "up" ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {stat.trend === "up" ? (
-                    <ArrowUpRight className="h-4 w-4 mr-1" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 mr-1" />
-                  )}
-                  {stat.change}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <Card key={index}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="bg-primary/10 p-2 rounded-lg">
+                    {stat.icon}
+                  </div>
+                  <div
+                    className={`flex items-center ${
+                      stat.trend === "up" ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {stat.trend === "up" ? (
+                      <ArrowUpRight className="h-4 w-4 mr-1" />
+                    ) : (
+                      <ArrowDownRight className="h-4 w-4 mr-1" />
+                    )}
+                    {stat.change}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm text-muted-foreground">{stat.title}</h3>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                <div className="space-y-1">
+                  <h3 className="text-sm text-muted-foreground">
+                    {stat.title}
+                  </h3>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Donations */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Donations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {dashboardData.recentDonations.map((donation) => (
+                  <div
+                    key={donation.id}
+                    className="flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-medium">{donation.donor}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {donation.date}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${donation.amount}</p>
+                    </div>
+                  </div>
+                ))}
+                <Button variant="outline" className="w-full">
+                  View All Donations
+                </Button>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Donations */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Donations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.recentDonations.map((donation) => (
-                <div
-                  key={donation.id}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium">{donation.donor}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {donation.date}
-                    </p>
+          {/* Pending Aid Requests */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Aid Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {dashboardData.recentRequests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-medium">{request.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {request.type}
+                      </p>
+                    </div>
+                    <Button size="sm">Review</Button>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">${donation.amount}</p>
-                  </div>
-                </div>
-              ))}
-              <Button variant="outline" className="w-full">
-                View All Donations
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Pending Aid Requests */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Pending Aid Requests</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.recentRequests.map((request) => (
-                <div
-                  key={request.id}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium">{request.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {request.type}
-                    </p>
-                  </div>
-                  <Button size="sm">Review</Button>
-                </div>
-              ))}
-              <Button variant="outline" className="w-full">
-                View All Requests
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+                <Button variant="outline" className="w-full">
+                  View All Requests
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
