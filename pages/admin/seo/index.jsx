@@ -15,7 +15,7 @@ const mockSeoData = {
     {
       id: 1,
       path: "/",
-      title: "Hope Foundation - Empowering Communities",
+      title: "RWWS - Empowering Communities",
       description:
         "Join us in our mission to create lasting change and empower communities worldwide through sustainable development and humanitarian aid.",
       keywords: "charity, nonprofit, humanitarian aid, community development",
@@ -24,7 +24,7 @@ const mockSeoData = {
     {
       id: 2,
       path: "/about",
-      title: "About Us - Hope Foundation",
+      title: "About Us - RWWS",
       description:
         "Learn about our mission, vision, team, and the impact we're making around the world through various humanitarian programs.",
       keywords: "about us, mission, vision, team, impact",
@@ -33,7 +33,7 @@ const mockSeoData = {
     {
       id: 3,
       path: "/programs",
-      title: "Our Programs - Hope Foundation",
+      title: "Our Programs - RWWS",
       description:
         "Explore our diverse range of programs focused on clean water, education, healthcare, and community development.",
       keywords: "programs, initiatives, water, education, healthcare",

@@ -67,7 +67,7 @@ const newsItems = [
   },
   {
     id: 3,
-    title: "Hope Foundation Receives Humanitarian Award",
+    title: "RWWS Receives Humanitarian Award",
     date: "April 10, 2025",
     excerpt:
       "Recognized for outstanding contributions to community development.",
@@ -147,11 +147,10 @@ export default function Home() {
             <div>
               <h2 className="text-3xl font-bold mb-6">Our Mission & Vision</h2>
               <p className="text-lg mb-6">
-                At Hope Foundation, we believe in creating a world where every
-                person has access to the basic necessities of life and the
-                opportunity to thrive. Our mission is to empower communities
-                through sustainable development programs and immediate relief
-                efforts.
+                At RWWS, we believe in creating a world where every person has
+                access to the basic necessities of life and the opportunity to
+                thrive. Our mission is to empower communities through
+                sustainable development programs and immediate relief efforts.
               </p>
               <p className="text-lg mb-6">
                 We envision a future where poverty is eliminated, education is
@@ -308,7 +307,7 @@ export default function Home() {
           </h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Whether you want to donate, volunteer, or apply for aid, there are
-            many ways to get involved with Hope Foundation.
+            many ways to get involved with RWWS.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button

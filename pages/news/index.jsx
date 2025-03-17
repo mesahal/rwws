@@ -27,13 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { fetchNews } from "../../lib/api";
+import { getAll } from "../../lib/api";
+import { newsService } from "../../lib/news";
 
 export const metadata = {
-  title: "News & Updates - Hope Foundation",
+  title: "News & Updates - RWWS",
   description:
     "Stay informed about our latest initiatives, events, and impact stories",
 };
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
 // Mock data (would come from API in production)
 // const newsItems = [
@@ -61,7 +63,7 @@ export const metadata = {
 //   },
 //   {
 //     id: 3,
-//     title: "Hope Foundation Receives Humanitarian Award",
+//     title: "RWWS Receives Humanitarian Award",
 //     date: "April 10, 2025",
 //     excerpt:
 //       "Recognized for outstanding contributions to community development and sustainable solutions for poverty alleviation worldwide.",
@@ -127,6 +129,15 @@ export const metadata = {
 //   },
 // ];
 
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
 const categories = [
   "All Categories",
   "Events",
@@ -142,23 +153,29 @@ const years = ["All Years", "2025", "2024", "2023", "2022"];
 export async function getServerSideProps(context) {
   const page = context.query.page ? parseInt(context.query.page) : 1;
   try {
-    const { items: newsItems, totalPages } = await fetchNews(page);
-    return { props: { newsItems, totalPages, page } };
+    // const response = await newsService.getAll(page, 10);
+    const response = await getAll(page, 10);
+    const { newsList, total_count } = response.data; // ✅ Correct Destructuring
+    return {
+      props: {
+        newsItems: newsList,
+        totalPages: Math.ceil(total_count / 10),
+        page,
+      },
+    };
   } catch (error) {
     console.error("Error fetching news:", error);
     return { props: { newsItems: [], totalPages: 1, page: 1 } };
   }
 }
+
 export default function NewsPage({ newsItems, totalPages, page }) {
   // const page = searchParams?.page ? parseInt(searchParams.page) : 1;
   // const { items: newsItems, totalPages } = await fetchNews(page);
-  const itemsPerPage = 6;
+  // const itemsPerPage = 6;
   // const totalPages = Math.ceil(newsItems.length / itemsPerPage);
 
-  // Calculate the items to display on the current page
-  const startIndex = (page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = newsItems.slice(startIndex, endIndex);
+  const currentItems = newsItems;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -239,22 +256,24 @@ export default function NewsPage({ newsItems, totalPages, page }) {
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   <div className="relative h-64 md:h-auto">
                     <Image
-                      src={newsItems[0].image}
+                      src={`${BASE_URL}${newsItems[0].image}`}
                       alt={newsItems[0].title}
                       fill
                       style={{ objectFit: "cover" }}
                     />
                     <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                      {newsItems[0].category}
+                      {newsItems[0].category_name}
                     </div>
                   </div>
                   <div className="p-6 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center text-muted-foreground mb-2">
                         <Calendar className="h-4 w-4 mr-2" />
-                        <span className="text-sm">{newsItems[0].date}</span>
+                        <span className="text-sm">
+                          {formatDate(newsItems[0].updated_at)}
+                        </span>
                         <span className="mx-2">•</span>
-                        <span className="text-sm">{newsItems[0].author}</span>
+                        {/* <span className="text-sm">{newsItems[0].author}</span> */}
                       </div>
                       <h2 className="text-2xl font-bold mb-4">
                         {newsItems[0].title}
@@ -281,19 +300,21 @@ export default function NewsPage({ newsItems, totalPages, page }) {
               <Card key={item.id} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
-                    src={item.image}
+                    src={`${BASE_URL}${item.image}`}
                     alt={item.title}
                     fill
                     style={{ objectFit: "cover" }}
                   />
                   <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                    {item.category}
+                    {item.category_name}
                   </div>
                 </div>
                 <CardHeader>
                   <div className="flex items-center text-muted-foreground mb-2">
                     <Calendar className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{item.date}</span>
+                    <span className="text-sm">
+                      {formatDate(item.updated_at)}
+                    </span>
                   </div>
                   <CardTitle>{item.title}</CardTitle>
                 </CardHeader>

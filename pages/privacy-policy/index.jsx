@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy - Hope Foundation",
+  title: "Privacy Policy - RWWS",
   description:
     "Our commitment to protecting your privacy and personal information",
 };
@@ -28,11 +28,10 @@ export default function PrivacyPolicyPage() {
 
               <h2>1. Introduction</h2>
               <p>
-                Hope Foundation ("we," "our," or "us") is committed to
-                protecting your privacy. This Privacy Policy explains how we
-                collect, use, disclose, and safeguard your information when you
-                visit our website, use our services, or interact with us in any
-                way.
+                RWWS ("we," "our," or "us") is committed to protecting your
+                privacy. This Privacy Policy explains how we collect, use,
+                disclose, and safeguard your information when you visit our
+                website, use our services, or interact with us in any way.
               </p>
 
               <h2>2. Information We Collect</h2>
@@ -119,7 +118,7 @@ export default function PrivacyPolicyPage() {
                 contact us at:
               </p>
               <p>
-                Hope Foundation
+                RWWS
                 <br />
                 123 Hope Street
                 <br />

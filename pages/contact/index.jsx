@@ -347,7 +347,7 @@ export default function ContactPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-2">
-                  How can I volunteer with Hope Foundation?
+                  How can I volunteer with RWWS?
                 </h3>
                 <p className="text-muted-foreground">
                   We offer various volunteer opportunities both locally and
@@ -362,16 +362,16 @@ export default function ContactPage() {
                   Is my donation tax-deductible?
                 </h3>
                 <p className="text-muted-foreground">
-                  Yes, Hope Foundation is a registered 501(c)(3) non-profit
-                  organization. Your donations are tax-deductible to the extent
-                  allowed by law.
+                  Yes, RWWS is a registered 501(c)(3) non-profit organization.
+                  Your donations are tax-deductible to the extent allowed by
+                  law.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-2">
-                  How can I apply for aid from Hope Foundation?
+                  How can I apply for aid from RWWS?
                 </h3>
                 <p className="text-muted-foreground">
                   You can apply for aid through our online application portal.

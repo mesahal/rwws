@@ -1,75 +1,115 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Filter } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowRight, Filter } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock data (would come from API in production)
 const impactStories = [
   {
     id: 1,
     title: "Clean Water for Rural Village",
-    excerpt: "How our water project transformed the lives of 500 families in a remote village.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    excerpt:
+      "How our water project transformed the lives of 500 families in a remote village.",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Water & Sanitation",
-    location: "East Africa"
+    location: "East Africa",
   },
   {
     id: 2,
     title: "Education for All Initiative",
-    excerpt: "Providing quality education to 1,000 underprivileged children in urban areas.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    excerpt:
+      "Providing quality education to 1,000 underprivileged children in urban areas.",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Education",
-    location: "South Asia"
+    location: "South Asia",
   },
   {
     id: 3,
     title: "Healthcare Outreach Program",
-    excerpt: "Mobile clinics bringing essential healthcare to remote communities.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    excerpt:
+      "Mobile clinics bringing essential healthcare to remote communities.",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Healthcare",
-    location: "Latin America"
+    location: "Latin America",
   },
   {
     id: 4,
     title: "Sustainable Farming Project",
-    excerpt: "Teaching sustainable farming techniques to improve food security.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    excerpt:
+      "Teaching sustainable farming techniques to improve food security.",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Agriculture",
-    location: "West Africa"
+    location: "West Africa",
   },
   {
     id: 5,
     title: "Women's Empowerment Program",
     excerpt: "Providing skills training and microloans to women entrepreneurs.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Economic Development",
-    location: "South Asia"
+    location: "South Asia",
   },
   {
     id: 6,
     title: "Disaster Relief Efforts",
-    excerpt: "Providing emergency aid to communities affected by natural disasters.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+    excerpt:
+      "Providing emergency aid to communities affected by natural disasters.",
+    content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image:
+      "https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     category: "Emergency Relief",
-    location: "Southeast Asia"
-  }
-]
+    location: "Southeast Asia",
+  },
+];
 
-const categories = ["All", "Water & Sanitation", "Education", "Healthcare", "Agriculture", "Economic Development", "Emergency Relief"]
-const locations = ["All", "East Africa", "West Africa", "South Asia", "Southeast Asia", "Latin America"]
+const categories = [
+  "All",
+  "Water & Sanitation",
+  "Education",
+  "Healthcare",
+  "Agriculture",
+  "Economic Development",
+  "Emergency Relief",
+];
+const locations = [
+  "All",
+  "East Africa",
+  "West Africa",
+  "South Asia",
+  "Southeast Asia",
+  "Latin America",
+];
 
 export const metadata = {
-  title: 'Impact Stories - Hope Foundation',
-  description: 'Real stories of how our programs are changing lives and communities around the world',
-}
+  title: "Impact Stories - RWWS",
+  description:
+    "Real stories of how our programs are changing lives and communities around the world",
+};
 
 export default function ImpactStories() {
   return (
@@ -78,11 +118,11 @@ export default function ImpactStories() {
       <section className="relative bg-gradient-to-r from-primary to-chart-3 text-white py-16">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
-          <Image 
-            src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+          <Image
+            src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
             alt="People helping each other"
             fill
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: "cover" }}
             priority
           />
         </div>
@@ -90,7 +130,8 @@ export default function ImpactStories() {
           <div className="max-w-3xl">
             <h1 className="text-4xl font-bold mb-4">Impact Stories</h1>
             <p className="text-xl mb-0">
-              Real stories of how our programs are changing lives and communities around the world.
+              Real stories of how our programs are changing lives and
+              communities around the world.
             </p>
           </div>
         </div>
@@ -113,7 +154,11 @@ export default function ImpactStories() {
                 <TabsContent value="category" className="mt-4">
                   <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
-                      <Button key={category} variant={category === "All" ? "default" : "outline"} size="sm">
+                      <Button
+                        key={category}
+                        variant={category === "All" ? "default" : "outline"}
+                        size="sm"
+                      >
                         {category}
                       </Button>
                     ))}
@@ -122,7 +167,11 @@ export default function ImpactStories() {
                 <TabsContent value="location" className="mt-4">
                   <div className="flex flex-wrap gap-2">
                     {locations.map((location) => (
-                      <Button key={location} variant={location === "All" ? "default" : "outline"} size="sm">
+                      <Button
+                        key={location}
+                        variant={location === "All" ? "default" : "outline"}
+                        size="sm"
+                      >
                         {location}
                       </Button>
                     ))}
@@ -141,11 +190,11 @@ export default function ImpactStories() {
             {impactStories.map((story) => (
               <Card key={story.id} className="overflow-hidden">
                 <div className="relative h-48">
-                  <Image 
-                    src={story.image} 
+                  <Image
+                    src={story.image}
                     alt={story.title}
                     fill
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: "cover" }}
                   />
                   <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                     {story.category}
@@ -176,9 +225,12 @@ export default function ImpactStories() {
       {/* Call to Action */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Help Us Create More Success Stories</h2>
+          <h2 className="text-3xl font-bold mb-6">
+            Help Us Create More Success Stories
+          </h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Your support enables us to continue making a positive impact in communities around the world.
+            Your support enables us to continue making a positive impact in
+            communities around the world.
           </p>
           <Button asChild size="lg">
             <Link href="/donate">Donate Now</Link>
@@ -186,5 +238,5 @@ export default function ImpactStories() {
         </div>
       </section>
     </div>
-  )
+  );
 }

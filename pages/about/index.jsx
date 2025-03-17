@@ -16,7 +16,7 @@ import {
 } from "../../lib/api";
 
 export const metadata = {
-  title: "About Us - Hope Foundation",
+  title: "About Us - RWWS",
   description:
     "Learn about our mission, vision, team, and the impact we're making around the world",
 };
@@ -117,7 +117,7 @@ export const metadata = {
 //     year: 2005,
 //     title: "Foundation Established",
 //     description:
-//       "Hope Foundation was established with a mission to create sustainable change in underserved communities.",
+//       "RWWS was established with a mission to create sustainable change in underserved communities.",
 //   },
 //   {
 //     year: 2008,
@@ -196,7 +196,7 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold mb-4">About Hope Foundation</h1>
+            <h1 className="text-4xl font-bold mb-4">About RWWS</h1>
             <p className="text-xl mb-0">
               Learn about our mission, vision, team, and the impact we're making
               around the world.
@@ -381,9 +381,9 @@ export default function AboutPage({ team, partners, milestones }) {
               Our History & Milestones
             </h2>
             <p className="text-lg max-w-3xl mx-auto">
-              Since our founding in 2005, Hope Foundation has grown from a small
-              grassroots organization to a global non-profit making an impact in
-              over 50 countries.
+              Since our founding in 2005, RWWS has grown from a small grassroots
+              organization to a global non-profit making an impact in over 50
+              countries.
             </p>
           </div>
           <div className="relative">
@@ -619,7 +619,7 @@ export default function AboutPage({ team, partners, milestones }) {
           </h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Whether you want to donate, volunteer, or apply for aid, there are
-            many ways to get involved with Hope Foundation.
+            many ways to get involved with RWWS.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button

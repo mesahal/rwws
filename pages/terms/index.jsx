@@ -4,7 +4,7 @@
 // import { ArrowLeft } from 'lucide-react'
 
 // export const metadata = {
-//   title: 'Terms of Service - Hope Foundation',
+//   title: 'Terms of Service - RWWS',
 //   description: 'Terms and conditions governing the use of our services and website',
 // }
 
@@ -27,7 +27,7 @@
 
 //               <h2>1. Agreement to Terms</h2>
 //               <p>
-//                 By accessing or using Hope Foundation's website and services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our services.
+//                 By accessing or using RWWS's website and services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our services.
 //               </p>
 
 //               <h2>2. Use License</h2>

@@ -42,7 +42,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
               <Heart className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-xl font-bold">Hope Foundation</span>
+              <span className="ml-2 text-xl font-bold">RWWS</span>
             </Link>
           </div>
 

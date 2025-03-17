@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { newsService } from "@/lib/news";
+import { getAll, create, update } from "../../../lib/api";
 import {
   FileText,
   Newspaper,
@@ -60,9 +61,9 @@ export default function ContentManagement() {
 
   const fetchNews = async () => {
     try {
-      const response = await newsService.getAll(currentPage, 10);
-      setNews(response.items);
-      setTotalPages(response.totalPages);
+      const response = await getAll(currentPage, 10);
+      setNews(response.data.newsList);
+      setTotalPages(Math.ceil(response.data.total_count) / 10);
     } catch (error) {
       toast({
         title: "Error",
@@ -96,7 +97,7 @@ export default function ContentManagement() {
     );
 
     try {
-      const response = await newsService.create(formData);
+      const response = await create(formData);
       if (response.success) {
         toast({
           title: "Success",

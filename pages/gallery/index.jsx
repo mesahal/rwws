@@ -19,7 +19,7 @@ import {
 import { Play, Download, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const metadata = {
-  title: "Media Gallery - Hope Foundation",
+  title: "Media Gallery - RWWS",
   description:
     "Browse photos and videos from our projects, events, and initiatives around the world",
 };

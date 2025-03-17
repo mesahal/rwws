@@ -14,7 +14,7 @@ const events = [
     title: "Annual Charity Gala",
     description: "Join us for an evening of inspiration and giving at our annual fundraising gala. The event includes dinner, entertainment, silent auction, and inspiring stories from the communities we serve.",
     longDescription: `
-      <p>The Hope Foundation's Annual Charity Gala is our premier fundraising event of the year, bringing together supporters, partners, and community leaders for an evening of inspiration, connection, and giving.</p>
+      <p>The RWWS's Annual Charity Gala is our premier fundraising event of the year, bringing together supporters, partners, and community leaders for an evening of inspiration, connection, and giving.</p>
       
       <h3>Event Details</h3>
       
@@ -50,7 +50,7 @@ const events = [
       
       <h3>Accommodations</h3>
       
-      <p>A block of rooms has been reserved at the Grand Metropolitan Hotel at a special rate for gala attendees. Please mention the Hope Foundation Gala when booking.</p>
+      <p>A block of rooms has been reserved at the Grand Metropolitan Hotel at a special rate for gala attendees. Please mention the RWWS Gala when booking.</p>
     `,
     date: "July 15, 2025",
     time: "6:00 PM - 10:00 PM",
@@ -65,7 +65,7 @@ const events = [
     ],
     attendees: 250,
     registration: true,
-    organizer: "Hope Foundation Events Team",
+    organizer: "RWWS Events Team",
     contact: "events@hopefoundation.org",
     phone: "(555) 123-4567"
   },
@@ -74,14 +74,14 @@ const events = [
     title: "Volunteer Training Workshop",
     description: "A comprehensive training session for new volunteers joining our global initiatives. Learn about our programs, policies, and how to make the most impact in your volunteer role.",
     longDescription: `
-      <p>Thank you for your interest in volunteering with Hope Foundation! This comprehensive training workshop is designed to prepare you for your volunteer role and help you make the most meaningful impact in our programs.</p>
+      <p>Thank you for your interest in volunteering with RWWS! This comprehensive training workshop is designed to prepare you for your volunteer role and help you make the most meaningful impact in our programs.</p>
       
       <h3>Workshop Overview</h3>
       
       <p>This full-day training session will cover:</p>
       
       <ul>
-        <li>Introduction to Hope Foundation's mission, vision, and programs</li>
+        <li>Introduction to RWWS's mission, vision, and programs</li>
         <li>Understanding the communities we serve and cultural sensitivity</li>
         <li>Volunteer policies, procedures, and code of conduct</li>
         <li>Health and safety guidelines</li>
@@ -119,11 +119,11 @@ const events = [
       
       <h3>Follow-Up</h3>
       
-      <p>After completing the workshop, you will receive a certificate of completion and be assigned a mentor who will support you as you begin your volunteer journey with Hope Foundation.</p>
+      <p>After completing the workshop, you will receive a certificate of completion and be assigned a mentor who will support you as you begin your volunteer journey with RWWS.</p>
     `,
     date: "August 5, 2025",
     time: "9:00 AM - 4:00 PM",
-    location: "Hope Foundation Headquarters, Chicago",
+    location: "RWWS Headquarters, Chicago",
     address: "456 Hope Street, Chicago, IL 60601",
     type: "Training",
     image: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
@@ -143,7 +143,7 @@ const events = [
     title: "Community Health Fair",
     description: "Free health screenings and education for underserved communities. Services include blood pressure checks, diabetes screening, nutrition counseling, and more.",
     longDescription: `
-      <p>Hope Foundation is proud to present our Community Health Fair, a free event designed to provide essential health services and education to underserved communities. This event is open to all community members, regardless of insurance status or ability to pay.</p>
+      <p>RWWS is proud to present our Community Health Fair, a free event designed to provide essential health services and education to underserved communities. This event is open to all community members, regardless of insurance status or ability to pay.</p>
       
       <h3>Services Offered</h3>
       

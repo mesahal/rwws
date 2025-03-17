@@ -18,7 +18,7 @@ import {
 import { Calendar, Clock, MapPin, Users, ArrowRight } from "lucide-react";
 
 export const metadata = {
-  title: "Events Calendar - Hope Foundation",
+  title: "Events Calendar - RWWS",
   description:
     "Upcoming events, fundraisers, volunteer opportunities, and more",
 };
@@ -46,7 +46,7 @@ const events = [
       "A comprehensive training session for new volunteers joining our global initiatives. Learn about our programs, policies, and how to make the most impact in your volunteer role.",
     date: "August 5, 2025",
     time: "9:00 AM - 4:00 PM",
-    location: "Hope Foundation Headquarters, Chicago",
+    location: "RWWS Headquarters, Chicago",
     type: "Training",
     image:
       "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",

@@ -1,6 +1,7 @@
 import { toast } from "@/hooks/use-toast";
 
-const API_BASE_URL = "https://rwws.vercel.app/rwws/v1/auth";
+// const API_BASE_URL = "https://rwws.vercel.app/rwws/v1/auth";
+const API_BASE_URL = "http://localhost:5000/rwws/v1/auth";
 
 export interface AuthResponse {
   success: boolean;
