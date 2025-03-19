@@ -14,34 +14,34 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
-import { fetchNews } from "../lib/api";
+import { getAll } from "../lib/api";
 
 export default function NewsDetail({ newsItem }) {
-  const [relatedNews, setRelatedNews] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [relatedNews, setRelatedNews] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchRelated = async () => {
-      try {
-        // Fetch all news to find related items
-        const { items } = await fetchNews();
-        const related = items
-          .filter(
-            (item) =>
-              item.id !== newsItem.id && item.category === newsItem.category
-          )
-          .slice(0, 3);
+  // useEffect(() => {
+  //   const fetchRelated = async () => {
+  //     try {
+  //       // Fetch all news to find related items
+  //       const { items } = await getAll();
+  //       const related = items
+  //         .filter(
+  //           (item) =>
+  //             item.id !== newsItem.id && item.category === newsItem.category
+  //         )
+  //         .slice(0, 3);
 
-        setRelatedNews(related);
-      } catch (error) {
-        console.error("Error fetching related news:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       setRelatedNews(related);
+  //     } catch (error) {
+  //       console.error("Error fetching related news:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchRelated();
-  }, [newsItem]);
+  //   fetchRelated();
+  // }, [newsItem]);
 
   if (!newsItem) {
     return <div className="text-center py-8">News item not found</div>;
@@ -83,10 +83,10 @@ export default function NewsDetail({ newsItem }) {
             </Button>
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium">
-                {newsItem.category}
+                {newsItem.category_name}
               </span>
               <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
-                <Calendar className="h-3 w-3 mr-1" /> {newsItem.date}
+                <Calendar className="h-3 w-3 mr-1" /> {newsItem.updated_at}
               </span>
             </div>
             <h1 className="text-4xl font-bold mb-4">{newsItem.title}</h1>
@@ -101,7 +101,7 @@ export default function NewsDetail({ newsItem }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               {/* Author info */}
-              <div className="flex items-center mb-8 p-4 bg-muted rounded-lg">
+              {/* <div className="flex items-center mb-8 p-4 bg-muted rounded-lg">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
                   <Image
                     src={newsItem.authorImage}
@@ -116,16 +116,16 @@ export default function NewsDetail({ newsItem }) {
                     {newsItem.authorRole}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Article content */}
-              <div
+              {/* <div
                 className="prose prose-lg max-w-none"
                 dangerouslySetInnerHTML={{ __html: newsItem.content }}
-              ></div>
+              ></div> */}
 
               {/* Tags */}
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <h3 className="text-lg font-medium mb-2">Tags:</h3>
                 <div className="flex flex-wrap gap-2">
                   {newsItem.tags.map((tag) => (
@@ -137,7 +137,7 @@ export default function NewsDetail({ newsItem }) {
                     </span>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Share buttons */}
               <div className="mt-8 flex items-center">
@@ -156,9 +156,9 @@ export default function NewsDetail({ newsItem }) {
               </div>
             </div>
 
+            {/* Photo Gallery */}
             <div>
-              {/* Photo Gallery */}
-              <div className="mb-8">
+              {/* <div className="mb-8">
                 <h3 className="text-xl font-bold mb-4">Photo Gallery</h3>
                 <div className="grid grid-cols-1 gap-4">
                   {newsItem.gallery &&
@@ -177,7 +177,7 @@ export default function NewsDetail({ newsItem }) {
                       </div>
                     ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Call to Action */}
               <Card className="bg-primary text-primary-foreground mb-8">
@@ -220,7 +220,7 @@ export default function NewsDetail({ newsItem }) {
       </section>
 
       {/* Related News */}
-      {relatedNews.length > 0 && (
+      {/* {relatedNews.length > 0 && (
         <section className="py-12 bg-muted">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold mb-8">Related News</h2>
@@ -256,7 +256,7 @@ export default function NewsDetail({ newsItem }) {
             </div>
           </div>
         </section>
-      )}
+      )} */}
     </div>
   );
 }

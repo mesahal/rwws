@@ -26,25 +26,20 @@ import {
 } from 'lucide-react'
 
 // Content type interfaces
-interface ContentItem {
-  id: string
-  title: string
-  excerpt: string
-  content: string
-  image?: File | null
-  category: string
-  status: string
-  date: string
-  author: string
-}
-
 interface ContentFormData {
   title: string
-  excerpt: string
-  content: string
-  category: string
-  status: string
-  image: File | null
+  excerpt?: string
+  content?: string
+  description?: string
+  long_description?: string
+  category_id: number
+  location?: string
+  locations?: string[]
+  video?: string
+  goals?: string[]
+  achievements?: string[]
+  status?: string
+  start_date?: string
 }
 
 export default function ContentManagement() {
@@ -53,48 +48,49 @@ export default function ContentManagement() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
+  const [selectedItem, setSelectedItem] = useState<ContentFormData | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('news')
-  const [contentItems, setContentItems] = useState<ContentItem[]>([])
+  const [contentItems, setContentItems] = useState([])
 
   // Form states
   const [formData, setFormData] = useState<ContentFormData>({
     title: '',
-    excerpt: '',
-    content: '',
-    category: '',
-    status: 'draft',
-    image: null
+    category_id: 1
   })
 
   // Content type specific configurations
   const contentTypes = {
     news: {
-      categories: ['Breaking News', 'Press Release', 'Update', 'Announcement'],
+      categories: [
+        { id: 1, name: 'Breaking News' },
+        { id: 2, name: 'Press Release' },
+        { id: 3, name: 'Update' },
+        { id: 4, name: 'Announcement' }
+      ],
       title: 'News Articles',
       icon: <Newspaper className="h-4 w-4 mr-2" />
     },
-    blogs: {
-      categories: ['Impact Stories', 'Field Reports', 'Opinion', 'Analysis'],
-      title: 'Blog Posts',
-      icon: <FileText className="h-4 w-4 mr-2" />
-    },
-    programs: {
-      categories: ['Water & Sanitation', 'Education', 'Healthcare', 'Economic Development'],
-      title: 'Programs',
-      icon: <BookOpen className="h-4 w-4 mr-2" />
-    },
-    reports: {
-      categories: ['Annual Report', 'Financial Report', 'Impact Report', 'Project Report'],
-      title: 'Reports',
-      icon: <FileSpreadsheet className="h-4 w-4 mr-2" />
-    },
     impact: {
-      categories: ['Community Stories', 'Project Outcomes', 'Testimonials', 'Case Studies'],
+      categories: [
+        { id: 5, name: 'Water & Sanitation' },
+        { id: 6, name: 'Education' },
+        { id: 7, name: 'Healthcare' },
+        { id: 8, name: 'Economic Development' }
+      ],
       title: 'Impact Stories',
       icon: <Heart className="h-4 w-4 mr-2" />
+    },
+    programs: {
+      categories: [
+        { id: 9, name: 'Clean Water' },
+        { id: 10, name: 'Education' },
+        { id: 11, name: 'Healthcare' },
+        { id: 12, name: 'Economic Development' }
+      ],
+      title: 'Programs',
+      icon: <BookOpen className="h-4 w-4 mr-2" />
     }
   }
 
@@ -122,33 +118,30 @@ export default function ContentManagement() {
   }
 
   const handleCreate = async () => {
-    if (!formData.title || !formData.excerpt || !formData.category) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const formDataToSend = new FormData()
-    if (formData.image) {
-      formDataToSend.append('image', formData.image)
-    }
-    formDataToSend.append('jsonData', JSON.stringify({
-      title: formData.title,
-      excerpt: formData.excerpt,
-      content: formData.content,
-      category: formData.category,
-      status: formData.status
-    }))
-
     try {
+      // Validate required fields based on content type
+      if (!formData.title || !formData.category_id) {
+        throw new Error("Please fill all required fields")
+      }
+
+      // Additional validation for specific content types
+      if (activeTab === 'impact' && (!formData.content || !formData.location)) {
+        throw new Error("Please fill all required fields for impact story")
+      }
+
+      if (activeTab === 'programs' && (!formData.description || !formData.long_description || !formData.status || !formData.start_date)) {
+        throw new Error("Please fill all required fields for program")
+      }
+
       // In a real app, this would be an API call specific to each content type
       const response = await fetch(`/api/${activeTab}`, {
         method: 'POST',
-        body: formDataToSend
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
+      
       const data = await response.json()
       
       if (data.success) {
@@ -171,187 +164,238 @@ export default function ContentManagement() {
     }
   }
 
-  const handleUpdate = async () => {
-    if (!selectedItem || !formData.title || !formData.excerpt || !formData.category) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const formDataToSend = new FormData()
-    if (formData.image) {
-      formDataToSend.append('image', formData.image)
-    }
-    formDataToSend.append('jsonData', JSON.stringify({
-      title: formData.title,
-      excerpt: formData.excerpt,
-      content: formData.content,
-      category: formData.category,
-      status: formData.status
-    }))
-
-    try {
-      // In a real app, this would be an API call specific to each content type
-      const response = await fetch(`/api/${activeTab}/${selectedItem.id}`, {
-        method: 'PUT',
-        body: formDataToSend
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: "Content updated successfully",
-        })
-        fetchContent()
-        setIsEditDialogOpen(false)
-        resetForm()
-      } else {
-        throw new Error(data.message)
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update content",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) {
-      return
-    }
-
-    try {
-      // In a real app, this would be an API call specific to each content type
-      const response = await fetch(`/api/${activeTab}/${id}`, {
-        method: 'DELETE'
-      })
-      const data = await response.json()
-      
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: "Content deleted successfully",
-        })
-        fetchContent()
-      } else {
-        throw new Error(data.message)
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete content",
-        variant: "destructive",
-      })
-    }
-  }
-
   const resetForm = () => {
     setFormData({
       title: '',
-      excerpt: '',
-      content: '',
-      category: '',
-      status: 'draft',
-      image: null
+      category_id: 1
     })
-    setSelectedItem(null)
   }
 
-  const openEditDialog = (item: ContentItem) => {
-    setSelectedItem(item)
-    setFormData({
-      title: item.title,
-      excerpt: item.excerpt,
-      content: item.content,
-      category: item.category,
-      status: item.status,
-      image: null
-    })
-    setIsEditDialogOpen(true)
-  }
+  const getFormFields = () => {
+    switch (activeTab) {
+      case 'news':
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                placeholder="Enter excerpt"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select 
+                value={formData.category_id.toString()} 
+                onValueChange={(value) => setFormData({ ...formData, category_id: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.news.categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )
 
-  const ContentForm = ({ mode }: { mode: 'create' | 'edit' }) => (
-    <div className="space-y-4 mt-4">
-      <div>
-        <Label htmlFor="title">Title</Label>
-        <Input
-          id="title"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Enter title"
-        />
-      </div>
-      <div>
-        <Label htmlFor="excerpt">Excerpt</Label>
-        <Textarea
-          id="excerpt"
-          value={formData.excerpt}
-          onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-          placeholder="Enter excerpt"
-        />
-      </div>
-      <div>
-        <Label htmlFor="content">Content</Label>
-        <Textarea
-          id="content"
-          value={formData.content}
-          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          placeholder="Enter content"
-          className="min-h-[200px]"
-        />
-      </div>
-      <div>
-        <Label htmlFor="category">Category</Label>
-        <Select 
-          value={formData.category} 
-          onValueChange={(value) => setFormData({ ...formData, category: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            {contentTypes[activeTab as keyof typeof contentTypes].categories.map((category) => (
-              <SelectItem key={category} value={category}>{category}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="status">Status</Label>
-        <Select 
-          value={formData.status} 
-          onValueChange={(value) => setFormData({ ...formData, status: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="image">Image</Label>
-        <Input
-          id="image"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setFormData({ ...formData, image: e.target.files?.[0] || null })}
-        />
-      </div>
-      <Button onClick={mode === 'create' ? handleCreate : handleUpdate} className="w-full">
-        {mode === 'create' ? 'Create' : 'Update'} {contentTypes[activeTab as keyof typeof contentTypes].title}
-      </Button>
-    </div>
-  )
+      case 'impact':
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                placeholder="Enter excerpt"
+              />
+            </div>
+            <div>
+              <Label htmlFor="content">Content</Label>
+              <Textarea
+                id="content"
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                placeholder="Enter content"
+                className="min-h-[200px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select 
+                value={formData.category_id.toString()} 
+                onValueChange={(value) => setFormData({ ...formData, category_id: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.impact.categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="Enter location"
+              />
+            </div>
+            <div>
+              <Label htmlFor="video">Video URL</Label>
+              <Input
+                id="video"
+                value={formData.video}
+                onChange={(e) => setFormData({ ...formData, video: e.target.value })}
+                placeholder="Enter video URL"
+              />
+            </div>
+          </>
+        )
+
+      case 'programs':
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Enter description"
+              />
+            </div>
+            <div>
+              <Label htmlFor="long_description">Long Description</Label>
+              <Textarea
+                id="long_description"
+                value={formData.long_description}
+                onChange={(e) => setFormData({ ...formData, long_description: e.target.value })}
+                placeholder="Enter long description"
+                className="min-h-[200px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select 
+                value={formData.category_id.toString()} 
+                onValueChange={(value) => setFormData({ ...formData, category_id: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.programs.categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="goals">Goals</Label>
+              <Textarea
+                id="goals"
+                value={formData.goals?.join('\n')}
+                onChange={(e) => setFormData({ ...formData, goals: e.target.value.split('\n').filter(Boolean) })}
+                placeholder="Enter goals (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="achievements">Achievements</Label>
+              <Textarea
+                id="achievements"
+                value={formData.achievements?.join('\n')}
+                onChange={(e) => setFormData({ ...formData, achievements: e.target.value.split('\n').filter(Boolean) })}
+                placeholder="Enter achievements (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="locations">Locations</Label>
+              <Textarea
+                id="locations"
+                value={formData.locations?.join('\n')}
+                onChange={(e) => setFormData({ ...formData, locations: e.target.value.split('\n').filter(Boolean) })}
+                placeholder="Enter locations (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="video">Video URL</Label>
+              <Input
+                id="video"
+                value={formData.video}
+                onChange={(e) => setFormData({ ...formData, video: e.target.value })}
+                placeholder="Enter video URL"
+              />
+            </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select 
+                value={formData.status} 
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Planned">Planned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="start_date">Start Date</Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={formData.start_date}
+                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              />
+            </div>
+          </>
+        )
+
+      default:
+        return null
+    }
+  }
 
   if (loading) {
     return (
@@ -390,7 +434,12 @@ export default function ContentManagement() {
             <DialogHeader>
               <DialogTitle>Create {contentTypes[activeTab as keyof typeof contentTypes].title}</DialogTitle>
             </DialogHeader>
-            <ContentForm mode="create" />
+            <div className="space-y-4 mt-4">
+              {getFormFields()}
+              <Button onClick={handleCreate} className="w-full">
+                Create {contentTypes[activeTab as keyof typeof contentTypes].title}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
@@ -400,17 +449,11 @@ export default function ContentManagement() {
           <TabsTrigger value="news">
             <Newspaper className="h-4 w-4 mr-2" /> News
           </TabsTrigger>
-          <TabsTrigger value="blogs">
-            <FileText className="h-4 w-4 mr-2" /> Blogs
-          </TabsTrigger>
-          <TabsTrigger value="programs">
-            <BookOpen className="h-4 w-4 mr-2" /> Programs
-          </TabsTrigger>
           <TabsTrigger value="impact">
             <Heart className="h-4 w-4 mr-2" /> Impact Stories
           </TabsTrigger>
-          <TabsTrigger value="reports">
-            <FileSpreadsheet className="h-4 w-4 mr-2" /> Reports
+          <TabsTrigger value="programs">
+            <BookOpen className="h-4 w-4 mr-2" /> Programs
           </TabsTrigger>
         </TabsList>
 
@@ -428,12 +471,11 @@ export default function ContentManagement() {
                         <th className="text-left py-3 px-4">Title</th>
                         <th className="text-left py-3 px-4">Category</th>
                         <th className="text-left py-3 px-4">Status</th>
-                        <th className="text-left py-3 px-4">Date</th>
                         <th className="text-right py-3 px-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {contentItems.map((item) => (
+                      {contentItems.map((item: any) => (
                         <tr key={item.id} className="border-b">
                           <td className="py-3 px-4">{item.title}</td>
                           <td className="py-3 px-4">{item.category}</td>
@@ -446,24 +488,15 @@ export default function ContentManagement() {
                               {item.status}
                             </span>
                           </td>
-                          <td className="py-3 px-4">{item.date}</td>
                           <td className="py-3 px-4">
                             <div className="flex justify-end space-x-2">
                               <Button variant="ghost" size="icon">
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => openEditDialog(item)}
-                              >
+                              <Button variant="ghost" size="icon">
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => handleDelete(item.id)}
-                              >
+                              <Button variant="ghost" size="icon">
                                 <Trash className="h-4 w-4" />
                               </Button>
                             </div>
@@ -473,39 +506,11 @@ export default function ContentManagement() {
                     </tbody>
                   </table>
                 </div>
-
-                <div className="flex justify-center mt-4 space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
         ))}
       </Tabs>
-
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit {contentTypes[activeTab as keyof typeof contentTypes].title}</DialogTitle>
-          </DialogHeader>
-          <ContentForm mode="edit" />
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

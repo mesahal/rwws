@@ -154,7 +154,7 @@ export async function getServerSideProps(context) {
   const page = context.query.page ? parseInt(context.query.page) : 1;
   try {
     // const response = await newsService.getAll(page, 10);
-    const response = await getAll(page, 10);
+    const response = await getAll(page, 10, "news");
     const { newsList, total_count } = response.data; // ✅ Correct Destructuring
     return {
       props: {
@@ -203,7 +203,7 @@ export default function NewsPage({ newsItems, totalPages, page }) {
       </section>
 
       {/* Search and Filters */}
-      <section className="py-8 bg-muted">
+      {/* <section className="py-8 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="w-full md:w-1/3">
@@ -244,7 +244,7 @@ export default function NewsPage({ newsItems, totalPages, page }) {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* News Grid */}
       <section className="py-12 bg-background">
@@ -278,7 +278,7 @@ export default function NewsPage({ newsItems, totalPages, page }) {
                       <h2 className="text-2xl font-bold mb-4">
                         {newsItems[0].title}
                       </h2>
-                      <p className="text-muted-foreground mb-6">
+                      <p className="text-muted-foreground mb-6 line-clamp-2">
                         {newsItems[0].excerpt}
                       </p>
                     </div>
@@ -319,7 +319,9 @@ export default function NewsPage({ newsItems, totalPages, page }) {
                   <CardTitle>{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>{item.excerpt}</CardDescription>
+                  <CardDescription className="line-clamp-2">
+                    {item.excerpt}
+                  </CardDescription>
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">

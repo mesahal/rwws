@@ -50,11 +50,11 @@ const AdminLayout = ({ children }) => {
       label: "Content",
       icon: <FileText className="h-5 w-5" />,
     },
-    {
-      href: "/admin/users",
-      label: "Users",
-      icon: <Users className="h-5 w-5" />,
-    },
+    // {
+    //   href: "/admin/users",
+    //   label: "Users",
+    //   icon: <Users className="h-5 w-5" />,
+    // },
     {
       href: "/admin/aid-requests",
       label: "Aid Requests",
@@ -65,11 +65,11 @@ const AdminLayout = ({ children }) => {
       label: "SEO & Analytics",
       icon: <Search className="h-5 w-5" />,
     },
-    {
-      href: "/admin/security",
-      label: "Security",
-      icon: <Shield className="h-5 w-5" />,
-    },
+    // {
+    //   href: "/admin/security",
+    //   label: "Security",
+    //   icon: <Shield className="h-5 w-5" />,
+    // },
   ];
 
   if (!isAuthenticated) return null;

@@ -35,39 +35,115 @@ import {
   Trash,
   Eye,
   Loader2,
+  Heart,
 } from "lucide-react";
 import AdminLayout from "../layout";
+// Content type interfaces
+// interface ContentItem {
+//   id: string
+//   title: string
+//   excerpt: string
+//   content: string
+//   image?: File | null
+//   category: string
+//   status: string
+//   date: string
+//   author: string
+// }
 
+// interface ContentFormData {
+//   title: string
+//   excerpt: string
+//   content: string
+//   category: string
+//   status: string
+//   image: File | null
+// }
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 export default function ContentManagement() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedNews, setSelectedNews] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("news");
+  const [contentItems, setContentItems] = useState([]);
 
-  // Form states
-  const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [categoryId, setCategoryId] = useState("1");
-  const [image, setImage] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    category_id: 1,
+  });
+
+  const contentTypes = {
+    news: {
+      categories: ["1", "2", "3"],
+      title: "News Articles",
+      icon: <Newspaper className="h-4 w-4 mr-2" />,
+    },
+    blogs: {
+      categories: ["Impact Stories", "Field Reports", "Opinion", "Analysis"],
+      title: "Blog Posts",
+      icon: <FileText className="h-4 w-4 mr-2" />,
+    },
+    programs: {
+      categories: [
+        "Water & Sanitation",
+        "Education",
+        "Healthcare",
+        "Economic Development",
+      ],
+      title: "Programs",
+      icon: <BookOpen className="h-4 w-4 mr-2" />,
+    },
+    reports: {
+      categories: [
+        "Annual Report",
+        "Financial Report",
+        "Impact Report",
+        "Project Report",
+      ],
+      title: "Reports",
+      icon: <FileSpreadsheet className="h-4 w-4 mr-2" />,
+    },
+    impact: {
+      categories: [
+        "Community Stories",
+        "Project Outcomes",
+        "Testimonials",
+        "Case Studies",
+      ],
+      title: "Impact Stories",
+      icon: <Heart className="h-4 w-4 mr-2" />,
+    },
+  };
 
   useEffect(() => {
-    fetchNews();
-  }, [currentPage]);
+    fetchContent();
+  }, [currentPage, activeTab]);
 
-  const fetchNews = async () => {
+  const fetchContent = async () => {
+    setLoading(true);
     try {
-      const response = await getAll(currentPage, 10);
-      setNews(response.data.newsList);
-      setTotalPages(Math.ceil(response.data.total_count) / 10);
+      const response = await getAll(1, 10, activeTab);
+      // const data = await response.json();
+      const data = response.data;
+      console.log(data);
+      setContentItems(data.newsList);
+      setTotalPages(1);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch news",
+        description: "Failed to fetch content",
         variant: "destructive",
       });
     } finally {
@@ -75,8 +151,16 @@ export default function ContentManagement() {
     }
   };
 
-  const handleCreate = async () => {
-    if (!title || !excerpt || !categoryId || !image) {
+  const categoryMap = {
+    news: 1,
+    impact: 2,
+    programs: 3,
+  };
+
+  const handleCreate = async (activeTab) => {
+    formData.category = categoryMap[activeTab] || null;
+    console.log(formData);
+    if (!formData.title || !formData.excerpt || !formData.category) {
       toast({
         title: "Error",
         description: "Please fill all required fields",
@@ -85,42 +169,53 @@ export default function ContentManagement() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("image", image);
-    formData.append(
+    const formDataToSend = new FormData();
+    if (formData.image) {
+      formDataToSend.append("image", formData.image);
+    }
+    formDataToSend.append(
       "jsonData",
       JSON.stringify({
-        title,
-        excerpt,
-        category_id: parseInt(categoryId),
+        title: formData.title,
+        excerpt: formData.excerpt,
+        // content: formData.content,
+        category_id: formData.category,
+        // status: formData.status,
       })
     );
 
     try {
-      const response = await create(formData);
-      if (response.success) {
+      const response = await create(formDataToSend, activeTab);
+      const data = response;
+
+      if (data.success) {
         toast({
           title: "Success",
-          description: "News created successfully",
+          description: "Content created successfully",
         });
-        fetchNews();
+        fetchContent();
         setIsCreateDialogOpen(false);
         resetForm();
       } else {
-        throw new Error(response.message);
+        throw new Error(data.message);
       }
     } catch (error) {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to create news",
+          error instanceof Error ? error.message : "Failed to create content",
         variant: "destructive",
       });
     }
   };
 
   const handleUpdate = async () => {
-    if (!selectedNews || !title || !excerpt || !categoryId) {
+    if (
+      !selectedItem ||
+      !formData.title ||
+      !formData.excerpt ||
+      !formData.category
+    ) {
       toast({
         title: "Error",
         description: "Please fill all required fields",
@@ -129,82 +224,495 @@ export default function ContentManagement() {
       return;
     }
 
-    const formData = new FormData();
-    if (image) {
-      formData.append("image", image);
+    const formDataToSend = new FormData();
+    if (formData.image) {
+      formDataToSend.append("image", formData.image);
     }
-    formData.append(
+    formDataToSend.append(
       "jsonData",
       JSON.stringify({
-        title,
-        excerpt,
-        category_id: parseInt(categoryId),
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        category: formData.category,
+        status: formData.status,
       })
     );
 
     try {
-      const response = await newsService.update(selectedNews.id, formData);
-      if (response.success) {
+      const response = await fetch(`/api/${activeTab}/${selectedItem.id}`, {
+        method: "PUT",
+        body: formDataToSend,
+      });
+      const data = await response.json();
+
+      if (data.success) {
         toast({
           title: "Success",
-          description: "News updated successfully",
+          description: "Content updated successfully",
         });
-        fetchNews();
+        fetchContent();
         setIsEditDialogOpen(false);
         resetForm();
       } else {
-        throw new Error(response.message);
+        throw new Error(data.message);
       }
     } catch (error) {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to update news",
+          error instanceof Error ? error.message : "Failed to update content",
         variant: "destructive",
       });
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this news item?")) {
+    if (!confirm("Are you sure you want to delete this item?")) {
       return;
     }
 
     try {
-      const response = await newsService.delete(id);
-      if (response.success) {
+      const response = await fetch(`/api/${activeTab}/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.success) {
         toast({
           title: "Success",
-          description: "News deleted successfully",
+          description: "Content deleted successfully",
         });
-        fetchNews();
+        fetchContent();
       } else {
-        throw new Error(response.message);
+        throw new Error(data.message);
       }
     } catch (error) {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to delete news",
+          error instanceof Error ? error.message : "Failed to delete content",
         variant: "destructive",
       });
     }
   };
 
   const resetForm = () => {
-    setTitle("");
-    setExcerpt("");
-    setCategoryId("1");
-    setImage(null);
-    setSelectedNews(null);
+    setFormData({
+      title: "",
+      excerpt: "",
+      content: "",
+      category: "",
+      status: "draft",
+      image: null,
+    });
+    setSelectedItem(null);
   };
 
-  const openEditDialog = (news) => {
-    setSelectedNews(news);
-    setTitle(news.title);
-    setExcerpt(news.excerpt);
-    setCategoryId(news.category_id.toString());
+  const openEditDialog = (item) => {
+    setSelectedItem(item);
+    setFormData({
+      title: item.title,
+      excerpt: item.excerpt,
+      content: item.content,
+      category: item.category,
+      status: item.status,
+      image: null,
+    });
     setIsEditDialogOpen(true);
+  };
+
+  const ContentForm = ({ mode }) => (
+    <div className="space-y-4 mt-4">
+      <div>
+        <Label htmlFor="title">Title</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="Enter title"
+        />
+      </div>
+      <div>
+        <Label htmlFor="excerpt">Excerpt</Label>
+        <Textarea
+          id="excerpt"
+          value={formData.excerpt}
+          onChange={(e) =>
+            setFormData({ ...formData, excerpt: e.target.value })
+          }
+          placeholder="Enter excerpt"
+        />
+      </div>
+      <div>
+        <Label htmlFor="content">Content</Label>
+        <Textarea
+          id="content"
+          value={formData.content}
+          onChange={(e) =>
+            setFormData({ ...formData, content: e.target.value })
+          }
+          placeholder="Enter content"
+          className="min-h-[200px]"
+        />
+      </div>
+      <div>
+        <Label htmlFor="category">Category</Label>
+        <Select
+          value={formData.category}
+          onValueChange={(value) =>
+            setFormData({ ...formData, category: value })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            {contentTypes[activeTab].categories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="status">Status</Label>
+        <Select
+          value={formData.status}
+          onValueChange={(value) => setFormData({ ...formData, status: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+            <SelectItem value="archived">Archived</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="image">Image</Label>
+        <Input
+          id="image"
+          type="file"
+          accept="image/*"
+          onChange={(e) =>
+            setFormData({ ...formData, image: e.target.files?.[0] || null })
+          }
+        />
+      </div>
+      <Button
+        onClick={mode === "create" ? handleCreate : handleUpdate}
+        className="w-full"
+      >
+        {mode === "create" ? "Create" : "Update"}{" "}
+        {contentTypes[activeTab].title}
+      </Button>
+    </div>
+  );
+
+  const getFormFields = () => {
+    switch (activeTab) {
+      case "news":
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) =>
+                  setFormData({ ...formData, excerpt: e.target.value })
+                }
+                placeholder="Enter excerpt"
+              />
+            </div>
+            {/* <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category_id.toString()}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category_id: parseInt(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.news.categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div> */}
+            <div>
+              <Label htmlFor="image">Image</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    image: e.target.files?.[0] || null,
+                  })
+                }
+              />
+            </div>
+          </>
+        );
+
+      case "impact":
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                value={formData.excerpt}
+                onChange={(e) =>
+                  setFormData({ ...formData, excerpt: e.target.value })
+                }
+                placeholder="Enter excerpt"
+              />
+            </div>
+            <div>
+              <Label htmlFor="content">Content</Label>
+              <Textarea
+                id="content"
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData({ ...formData, content: e.target.value })
+                }
+                placeholder="Enter content"
+                className="min-h-[200px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category_id.toString()}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category_id: parseInt(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.impact.categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) =>
+                  setFormData({ ...formData, location: e.target.value })
+                }
+                placeholder="Enter location"
+              />
+            </div>
+            <div>
+              <Label htmlFor="video">Video URL</Label>
+              <Input
+                id="video"
+                value={formData.video}
+                onChange={(e) =>
+                  setFormData({ ...formData, video: e.target.value })
+                }
+                placeholder="Enter video URL"
+              />
+            </div>
+          </>
+        );
+
+      case "programs":
+        return (
+          <>
+            <div>
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="Enter title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Enter description"
+              />
+            </div>
+            <div>
+              <Label htmlFor="long_description">Long Description</Label>
+              <Textarea
+                id="long_description"
+                value={formData.long_description}
+                onChange={(e) =>
+                  setFormData({ ...formData, long_description: e.target.value })
+                }
+                placeholder="Enter long description"
+                className="min-h-[200px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category_id.toString()}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category_id: parseInt(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentTypes.programs.categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="goals">Goals</Label>
+              <Textarea
+                id="goals"
+                value={formData.goals?.join("\n")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    goals: e.target.value.split("\n").filter(Boolean),
+                  })
+                }
+                placeholder="Enter goals (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="achievements">Achievements</Label>
+              <Textarea
+                id="achievements"
+                value={formData.achievements?.join("\n")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    achievements: e.target.value.split("\n").filter(Boolean),
+                  })
+                }
+                placeholder="Enter achievements (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="locations">Locations</Label>
+              <Textarea
+                id="locations"
+                value={formData.locations?.join("\n")}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    locations: e.target.value.split("\n").filter(Boolean),
+                  })
+                }
+                placeholder="Enter locations (one per line)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="video">Video URL</Label>
+              <Input
+                id="video"
+                value={formData.video}
+                onChange={(e) =>
+                  setFormData({ ...formData, video: e.target.value })
+                }
+                placeholder="Enter video URL"
+              />
+            </div>
+            <div>
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, status: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Planned">Planned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="start_date">Start Date</Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={formData.start_date}
+                onChange={(e) =>
+                  setFormData({ ...formData, start_date: e.target.value })
+                }
+              />
+            </div>
+          </>
+        );
+
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -218,22 +726,23 @@ export default function ContentManagement() {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <div>
+        {/* <div>
           <h1 className="text-3xl font-bold mb-2">Content Management</h1>
           <p className="text-muted-foreground">
             Manage all your website content in one place.
           </p>
-        </div>
+        </div> */}
 
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <h1 className="text-2xl font-bold mb-2">Content Management</h1>
+            {/* <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search content..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
-            />
+            /> */}
           </div>
           <Dialog
             open={isCreateDialogOpen}
@@ -246,58 +755,28 @@ export default function ContentManagement() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create News</DialogTitle>
+                <DialogTitle>
+                  Create {contentTypes[activeTab].title}
+                </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 mt-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter news title"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="excerpt">Excerpt</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
-                    placeholder="Enter news excerpt"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Category 1</SelectItem>
-                      <SelectItem value="2">Category 2</SelectItem>
-                      <SelectItem value="3">Category 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="image">Image</Label>
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setImage(e.target.files?.[0] || null)}
-                  />
-                </div>
-                <Button onClick={handleCreate} className="w-full">
-                  Create News
+                {getFormFields()}
+                <Button
+                  onClick={() => handleCreate(activeTab)}
+                  className="w-full"
+                >
+                  Create {contentTypes[activeTab].title}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
-        <Tabs defaultValue="news">
+        <Tabs
+          defaultValue="news"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList>
             <TabsTrigger value="news">
               <Newspaper className="h-4 w-4 mr-2" /> News
@@ -308,210 +787,110 @@ export default function ContentManagement() {
             <TabsTrigger value="programs">
               <BookOpen className="h-4 w-4 mr-2" /> Programs
             </TabsTrigger>
+            <TabsTrigger value="impact">
+              <Heart className="h-4 w-4 mr-2" /> Impact Stories
+            </TabsTrigger>
             <TabsTrigger value="reports">
               <FileSpreadsheet className="h-4 w-4 mr-2" /> Reports
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="news">
-            <Card>
-              <CardHeader>
-                <CardTitle>News Articles</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-3 px-4">Title</th>
-                        <th className="text-left py-3 px-4">Excerpt</th>
-                        <th className="text-left py-3 px-4">Category</th>
-                        <th className="text-right py-3 px-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {news.map((item) => (
-                        <tr key={item.id} className="border-b">
-                          <td className="py-3 px-4">{item.title}</td>
-                          <td className="py-3 px-4">{item.excerpt}</td>
-                          <td className="py-3 px-4">
-                            Category {item.category_id}
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex justify-end space-x-2">
-                              <Button variant="ghost" size="icon">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openEditDialog(item)}
+          {Object.keys(contentTypes).map((type) => (
+            <TabsContent key={type} value={type}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>{contentTypes[type].title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-4">Title</th>
+                          {/* <th className="text-left py-3 px-4">Category</th>
+                          <th className="text-left py-3 px-4">Status</th> */}
+                          <th className="text-left py-3 px-4">Date</th>
+                          <th className="text-right py-3 px-4">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {contentItems.map((item) => (
+                          <tr key={item.id} className="border-b">
+                            <td className="py-3 px-4">{item.title}</td>
+                            {/* <td className="py-3 px-4">{item.category}</td>
+                            <td className="py-3 px-4">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs ${
+                                  item.status === "published"
+                                    ? "bg-green-100 text-green-800"
+                                    : item.status === "draft"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
                               >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDelete(item.id)}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="flex justify-center mt-4 space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="blogs">
-            <Card>
-              <CardHeader>
-                <CardTitle>Blog Posts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mt-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4">Title</th>
-                          <th className="text-left py-3 px-4">Status</th>
-                          <th className="text-left py-3 px-4">Date</th>
-                          <th className="text-right py-3 px-4">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>{/* Blog content will go here */}</tbody>
+                                {item.status}
+                              </span>
+                            </td> */}
+                            <td className="py-3 px-4">
+                              {formatDate(item.updated_at)}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="flex justify-end space-x-2">
+                                <Button variant="ghost" size="icon">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => openEditDialog(item)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="programs">
-            <Card>
-              <CardHeader>
-                <CardTitle>Programs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mt-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4">Title</th>
-                          <th className="text-left py-3 px-4">Status</th>
-                          <th className="text-left py-3 px-4">Date</th>
-                          <th className="text-right py-3 px-4">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>{/* Programs content will go here */}</tbody>
-                    </table>
+                  <div className="flex justify-center mt-4 space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((prev) => prev - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                    >
+                      Next
+                    </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reports</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mt-6">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4">Title</th>
-                          <th className="text-left py-3 px-4">Status</th>
-                          <th className="text-left py-3 px-4">Date</th>
-                          <th className="text-right py-3 px-4">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>{/* Reports content will go here */}</tbody>
-                    </table>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
         </Tabs>
 
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit News</DialogTitle>
+              <DialogTitle>Edit {contentTypes[activeTab].title}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div>
-                <Label htmlFor="edit-title">Title</Label>
-                <Input
-                  id="edit-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter news title"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-excerpt">Excerpt</Label>
-                <Textarea
-                  id="edit-excerpt"
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  placeholder="Enter news excerpt"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-category">Category</Label>
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Category 1</SelectItem>
-                    <SelectItem value="2">Category 2</SelectItem>
-                    <SelectItem value="3">Category 3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="edit-image">Image (Optional)</Label>
-                <Input
-                  id="edit-image"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImage(e.target.files?.[0] || null)}
-                />
-              </div>
-              <Button onClick={handleUpdate} className="w-full">
-                Update News
-              </Button>
-            </div>
+            <ContentForm mode="edit" />
           </DialogContent>
         </Dialog>
       </div>

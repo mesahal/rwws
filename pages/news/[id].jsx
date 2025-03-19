@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { fetchNewsItem, fetchNews } from "../../lib/api";
+import { getById, getAll } from "../../lib/api";
 import NewsDetail from "../../components/NewsDetail";
 
 export async function getStaticPaths() {
   try {
-    const { items } = await fetchNews();
+    const { items } = await getAll();
     if (!items || items.length === 0) {
       console.warn("No news items found.");
       return { paths: [], fallback: true };
@@ -29,7 +29,7 @@ export async function getStaticProps({ params }) {
   }
 
   try {
-    const newsItem = await fetchNewsItem(params.id);
+    const newsItem = await getById(params.id);
 
     if (!newsItem) {
       return { notFound: true };
