@@ -149,17 +149,18 @@ const categories = [
   "Healthcare",
 ];
 const years = ["All Years", "2025", "2024", "2023", "2022"];
+const pageSize = 6;
 // ✅ Fetch news on each request (SSR)
 export async function getServerSideProps(context) {
   const page = context.query.page ? parseInt(context.query.page) : 1;
   try {
     // const response = await newsService.getAll(page, 10);
-    const response = await getAll(page, 10, "news");
+    const response = await getAll(page, pageSize, "news");
     const { newsList, total_count } = response.data; // ✅ Correct Destructuring
     return {
       props: {
         newsItems: newsList,
-        totalPages: Math.ceil(total_count / 10),
+        totalPages: Math.ceil(total_count / pageSize),
         page,
       },
     };
@@ -261,9 +262,9 @@ export default function NewsPage({ newsItems, totalPages, page }) {
                       fill
                       style={{ objectFit: "cover" }}
                     />
-                    <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                    {/* <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                       {newsItems[0].category_name}
-                    </div>
+                    </div> */}
                   </div>
                   <div className="p-6 flex flex-col justify-between">
                     <div>
@@ -305,9 +306,9 @@ export default function NewsPage({ newsItems, totalPages, page }) {
                     fill
                     style={{ objectFit: "cover" }}
                   />
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                  {/* <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                     {item.category_name}
-                  </div>
+                  </div> */}
                 </div>
                 <CardHeader>
                   <div className="flex items-center text-muted-foreground mb-2">
@@ -367,7 +368,7 @@ export default function NewsPage({ newsItems, totalPages, page }) {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-16 bg-muted">
+      {/* <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">Stay Updated</h2>
           <p className="text-lg mb-8 max-w-3xl mx-auto">
@@ -383,7 +384,7 @@ export default function NewsPage({ newsItems, totalPages, page }) {
             <Button>Subscribe</Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

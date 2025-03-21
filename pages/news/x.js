@@ -432,12 +432,12 @@ export default function ContentManagement() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create {contentTypes[activeTab as keyof typeof contentTypes].title}</DialogTitle>
+              <DialogTitle>Create {contentTypes[activeTab].title}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               {getFormFields()}
               <Button onClick={handleCreate} className="w-full">
-                Create {contentTypes[activeTab as keyof typeof contentTypes].title}
+                Create {contentTypes[activeTab].title}
               </Button>
             </div>
           </DialogContent>

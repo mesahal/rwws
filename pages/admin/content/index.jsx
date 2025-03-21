@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { newsService } from "@/lib/news";
-import { getAll, create, update } from "../../../lib/api";
+import { getAll, create, update, remove } from "../../../lib/api";
 import {
   FileText,
   Newspaper,
@@ -78,6 +78,11 @@ export default function ContentManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("news");
   const [contentItems, setContentItems] = useState([]);
+
+  const pageSize = 6;
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when tab changes
+  }, [activeTab]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -134,12 +139,12 @@ export default function ContentManagement() {
   const fetchContent = async () => {
     setLoading(true);
     try {
-      const response = await getAll(1, 10, activeTab);
+      const response = await getAll(currentPage, pageSize, activeTab);
       // const data = await response.json();
       const data = response.data;
       console.log(data);
       setContentItems(data.newsList);
-      setTotalPages(1);
+      setTotalPages(Math.ceil(data.total_count / pageSize));
     } catch (error) {
       toast({
         title: "Error",
@@ -183,7 +188,7 @@ export default function ContentManagement() {
         // status: formData.status,
       })
     );
-
+    console.log(formDataToSend);
     try {
       const response = await create(formDataToSend, activeTab);
       const data = response;
@@ -209,7 +214,23 @@ export default function ContentManagement() {
     }
   };
 
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    setFormData({
+      ...item,
+      category_id: item.category_id || 1,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleView = (item) => {
+    const viewPath = contentTypes[activeTab].viewPath;
+    router.push(`${viewPath}/${item.id}`);
+  };
+
   const handleUpdate = async () => {
+    formData.category = categoryMap[activeTab] || null;
+
     if (
       !selectedItem ||
       !formData.title ||
@@ -225,6 +246,7 @@ export default function ContentManagement() {
     }
 
     const formDataToSend = new FormData();
+    console.log(formDataToSend);
     if (formData.image) {
       formDataToSend.append("image", formData.image);
     }
@@ -233,18 +255,15 @@ export default function ContentManagement() {
       JSON.stringify({
         title: formData.title,
         excerpt: formData.excerpt,
-        content: formData.content,
-        category: formData.category,
-        status: formData.status,
+        // content: formData.content,
+        category_id: formData.category,
+        // status: formData.status,
       })
     );
 
     try {
-      const response = await fetch(`/api/${activeTab}/${selectedItem.id}`, {
-        method: "PUT",
-        body: formDataToSend,
-      });
-      const data = await response.json();
+      const response = await update(selectedItem.id, formDataToSend, activeTab);
+      const data = response;
 
       if (data.success) {
         toast({
@@ -273,10 +292,8 @@ export default function ContentManagement() {
     }
 
     try {
-      const response = await fetch(`/api/${activeTab}/${id}`, {
-        method: "DELETE",
-      });
-      const data = await response.json();
+      const response = await remove(id, activeTab);
+      const data = response;
 
       if (data.success) {
         toast({
@@ -836,13 +853,17 @@ export default function ContentManagement() {
                             </td>
                             <td className="py-3 px-4">
                               <div className="flex justify-end space-x-2">
-                                <Button variant="ghost" size="icon">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleView(item)}
+                                >
                                   <Eye className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => openEditDialog(item)}
+                                  onClick={() => handleEdit(item)}
                                 >
                                   <Edit className="h-4 w-4" />
                                 </Button>
@@ -885,12 +906,18 @@ export default function ContentManagement() {
           ))}
         </Tabs>
 
+        {/* Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit {contentTypes[activeTab].title}</DialogTitle>
             </DialogHeader>
-            <ContentForm mode="edit" />
+            <div className="space-y-4 mt-4">
+              {getFormFields()}
+              <Button onClick={handleUpdate} className="w-full">
+                Update {contentTypes[activeTab].title}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
