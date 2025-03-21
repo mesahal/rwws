@@ -658,20 +658,22 @@ export default function ContentManagement() {
                 <Plus className="h-4 w-4 mr-2" /> Create New
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] flex flex-col">
               <DialogHeader>
                 <DialogTitle>
                   Create {contentTypes[activeTab].title}
                 </DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
-                {getFormFields()}
-                <Button
-                  onClick={() => handleCreate(activeTab)}
-                  className="w-full"
-                >
-                  Create {contentTypes[activeTab].title}
-                </Button>
+              <div className="overflow-y-auto flex-1 px-1">
+                <div className="space-y-4 mt-4">
+                  {getFormFields()}
+                  <Button
+                    onClick={() => handleCreate(activeTab)}
+                    className="w-full"
+                  >
+                    Create {contentTypes[activeTab].title}
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
@@ -796,15 +798,17 @@ export default function ContentManagement() {
 
         {/* Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Edit {contentTypes[activeTab].title}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
-              {getFormFields()}
-              <Button onClick={handleUpdate} className="w-full">
-                Update {contentTypes[activeTab].title}
-              </Button>
+            <div className="overflow-y-auto flex-1 px-1">
+              <div className="space-y-4 mt-4">
+                {getFormFields()}
+                <Button onClick={handleUpdate} className="w-full">
+                  Update {contentTypes[activeTab].title}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
