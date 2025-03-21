@@ -27,9 +27,9 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "Impact Stories", href: "/impact-stories" },
     { name: "News", href: "/news" },
-    { name: "Blog", href: "/blog" },
-    { name: "Events", href: "/events" },
-    { name: "Gallery", href: "/gallery" },
+    // { name: "Blog", href: "/blog" },
+    // { name: "Events", href: "/events" },
+    // { name: "Gallery", href: "/gallery" },
     { name: "Programs", href: "/programs" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
@@ -41,7 +41,7 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <Heart className="h-8 w-8 text-primary" />
+              {/* <Heart className="h-8 w-8 text-primary" /> */}
               <span className="ml-2 text-xl font-bold">RWWS</span>
             </Link>
           </div>

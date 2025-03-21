@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -27,8 +27,30 @@ import {
   Globe,
   BookOpen,
 } from "lucide-react";
+import { getHome } from "@/lib/api"; // Import your API function
 
-export default function DonatePage() {
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
+
+export async function getStaticProps() {
+  try {
+    const homeData = await getHome(1, 10);
+    return {
+      props: {
+        homeContent: homeData.content[0] || null,
+      },
+      revalidate: 3600, // ISR revalidation
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      props: {
+        homeContent: null,
+      },
+    };
+  }
+}
+
+export default function DonatePage({ homeContent }) {
   const { toast } = useToast();
   const [donationAmount, setDonationAmount] = useState("50");
   const [customAmount, setCustomAmount] = useState("");
@@ -64,7 +86,7 @@ export default function DonatePage() {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="People helping each other"
             fill
             style={{ objectFit: "cover" }}
@@ -81,9 +103,10 @@ export default function DonatePage() {
           </div>
         </div>
       </section>
+      <h3 className="text-6xl text-center font-bold mt-60">Coming Soon</h3>
 
       {/* Donation Form */}
-      <section className="py-12 bg-background">
+      {/* <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -97,7 +120,6 @@ export default function DonatePage() {
                 <CardContent>
                   <form onSubmit={handleDonationSubmit}>
                     <div className="space-y-6">
-                      {/* Donation Type */}
                       <div>
                         <Label className="text-base">Donation Type</Label>
                         <RadioGroup
@@ -137,7 +159,6 @@ export default function DonatePage() {
                         </RadioGroup>
                       </div>
 
-                      {/* Donation Amount */}
                       <div>
                         <Label className="text-base">Donation Amount</Label>
                         <RadioGroup
@@ -218,7 +239,6 @@ export default function DonatePage() {
                         )}
                       </div>
 
-                      {/* Donation Allocation */}
                       <div>
                         <Label className="text-base">
                           Allocate Your Donation
@@ -288,7 +308,6 @@ export default function DonatePage() {
                         </RadioGroup>
                       </div>
 
-                      {/* Personal Information */}
                       <div>
                         <Label className="text-base">
                           Personal Information
@@ -313,7 +332,6 @@ export default function DonatePage() {
                         </div>
                       </div>
 
-                      {/* Payment Information */}
                       <div>
                         <Label className="text-base">Payment Information</Label>
                         <Tabs defaultValue="card" className="mt-2">
@@ -362,7 +380,6 @@ export default function DonatePage() {
                         </Tabs>
                       </div>
 
-                      {/* Additional Comments */}
                       <div>
                         <Label htmlFor="comments">
                           Additional Comments (Optional)
@@ -370,7 +387,6 @@ export default function DonatePage() {
                         <Textarea id="comments" className="mt-1" />
                       </div>
 
-                      {/* Submit Button */}
                       <Button type="submit" className="w-full">
                         {donationType === "one-time"
                           ? `Donate $${customAmount || donationAmount}`
@@ -396,7 +412,6 @@ export default function DonatePage() {
             </div>
 
             <div>
-              {/* Donation Impact */}
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle>Your Impact</CardTitle>
@@ -438,7 +453,6 @@ export default function DonatePage() {
                 </CardContent>
               </Card>
 
-              {/* Donation FAQ */}
               <Card>
                 <CardHeader>
                   <CardTitle>Frequently Asked Questions</CardTitle>
@@ -486,10 +500,10 @@ export default function DonatePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials */}
-      <section className="py-16 bg-muted">
+      {/* <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-12 text-center">
             Why Donors Support Us
@@ -564,7 +578,7 @@ export default function DonatePage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

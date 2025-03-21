@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -18,8 +18,29 @@ import {
 import { Textarea } from "../../components/ui/textarea";
 import { useToast } from "../../hooks/use-toast";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { getHome } from "@/lib/api"; // Import your API function
 
-export default function ContactPage() {
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
+
+export async function getStaticProps() {
+  try {
+    const homeData = await getHome(1, 10);
+    return {
+      props: {
+        homeContent: homeData.content[0] || null,
+      },
+      revalidate: 3600, // ISR revalidation
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      props: {
+        homeContent: null,
+      },
+    };
+  }
+}
+export default function ContactPage({ homeContent }) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -70,7 +91,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="Contact us"
             fill
             style={{ objectFit: "cover" }}
@@ -87,9 +108,10 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      <h3 className="text-6xl text-center font-bold mt-60">Coming Soon</h3>
 
       {/* Contact Form and Info */}
-      <section className="py-12 bg-background">
+      {/* <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -208,7 +230,6 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Contact Information */}
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-2xl font-bold mb-6">
@@ -261,7 +282,6 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              {/* Map */}
               <Card>
                 <CardContent className="p-0">
                   <div className="relative h-64 w-full">
@@ -286,7 +306,6 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              {/* Quick Links */}
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold mb-4">Quick Links</h2>
@@ -329,10 +348,10 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* FAQ Preview */}
-      <section className="py-16 bg-muted">
+      {/* <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">
@@ -399,7 +418,7 @@ export default function ContactPage() {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

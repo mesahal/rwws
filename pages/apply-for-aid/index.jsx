@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -25,8 +25,30 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { getHome } from "@/lib/api"; // Import your API function
 
-export default function AidApplicationPage() {
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
+
+export async function getStaticProps() {
+  try {
+    const homeData = await getHome(1, 10);
+    return {
+      props: {
+        homeContent: homeData.content[0] || null,
+      },
+      revalidate: 3600, // ISR revalidation
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      props: {
+        homeContent: null,
+      },
+    };
+  }
+}
+
+export default function AidApplicationPage({ homeContent }) {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isEligible, setIsEligible] = useState(null);
@@ -68,7 +90,7 @@ export default function AidApplicationPage() {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="Apply for Aid"
             fill
             style={{ objectFit: "cover" }}
@@ -86,10 +108,11 @@ export default function AidApplicationPage() {
         </div>
       </section>
 
+      <h3 className="text-6xl text-center font-bold mt-60">Coming Soon</h3>
+
       {/* Application Form */}
-      <section className="py-16 bg-background">
+      {/* <section className="py-16 bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div
@@ -326,10 +349,10 @@ export default function AidApplicationPage() {
             </Card>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* Additional Information */}
-      <section className="py-16 bg-muted">
+      {/* <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card>
@@ -375,7 +398,7 @@ export default function AidApplicationPage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

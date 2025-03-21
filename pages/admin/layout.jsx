@@ -55,16 +55,16 @@ const AdminLayout = ({ children }) => {
     //   label: "Users",
     //   icon: <Users className="h-5 w-5" />,
     // },
-    {
-      href: "/admin/aid-requests",
-      label: "Aid Requests",
-      icon: <HandHelping className="h-5 w-5" />,
-    },
-    {
-      href: "/admin/seo",
-      label: "SEO & Analytics",
-      icon: <Search className="h-5 w-5" />,
-    },
+    // {
+    //   href: "/admin/aid-requests",
+    //   label: "Aid Requests",
+    //   icon: <HandHelping className="h-5 w-5" />,
+    // },
+    // {
+    //   href: "/admin/seo",
+    //   label: "SEO & Analytics",
+    //   icon: <Search className="h-5 w-5" />,
+    // },
     // {
     //   href: "/admin/security",
     //   label: "Security",

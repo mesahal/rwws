@@ -14,172 +14,35 @@ import {
   fetchPartners,
   fetchMilestones,
 } from "../../lib/api";
+import { getHome } from "@/lib/api"; // Import your API function
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
+
+export async function getStaticProps() {
+  try {
+    const homeData = await getHome(1, 10);
+    return {
+      props: {
+        homeContent: homeData.content[0] || null,
+      },
+      revalidate: 3600, // ISR revalidation
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      props: {
+        homeContent: null,
+      },
+    };
+  }
+}
 export const metadata = {
   title: "About Us - RWWS",
   description:
     "Learn about our mission, vision, team, and the impact we're making around the world",
 };
 
-// Mock data (would come from API in production)
-// const teamMembers = [
-//   {
-//     id: 1,
-//     name: "Dr. Sarah Johnson",
-//     role: "Executive Director",
-//     bio: "Dr. Johnson has over 20 years of experience in international development and humanitarian work. She previously served with the UN and has a Ph.D. in International Development from Harvard University.",
-//     image:
-//       "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-//   {
-//     id: 2,
-//     name: "Michael Chen",
-//     role: "Chief Operations Officer",
-//     bio: "Michael brings 15 years of experience in non-profit management and has led operations for several international organizations. He holds an MBA from Stanford.",
-//     image:
-//       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-//   {
-//     id: 3,
-//     name: "Amara Okafor",
-//     role: "Director of Programs",
-//     bio: "Amara has implemented development programs across Africa and Asia for over a decade. She specializes in sustainable community development and holds a Master's in Public Health.",
-//     image:
-//       "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-//   {
-//     id: 4,
-//     name: "James Rodriguez",
-//     role: "Chief Financial Officer",
-//     bio: "James has 20 years of experience in financial management for non-profit organizations. He ensures transparency and accountability in all our financial operations.",
-//     image:
-//       "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-//   {
-//     id: 5,
-//     name: "Dr. Mei Lin",
-//     role: "Director of Healthcare Programs",
-//     bio: "Dr. Lin is a physician with extensive experience in global health initiatives. She has led medical missions in over 15 countries and specializes in public health systems.",
-//     image:
-//       "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-//   {
-//     id: 6,
-//     name: "Robert Kenyatta",
-//     role: "Director of Water Programs",
-//     bio: "Robert is a civil engineer with expertise in water infrastructure projects. He has implemented sustainable water solutions in rural communities across three continents.",
-//     image:
-//       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-//   },
-// ];
-
-// const partners = [
-//   {
-//     id: 1,
-//     name: "United Nations",
-//     logo: "https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "International Organization",
-//   },
-//   {
-//     id: 2,
-//     name: "Global Health Initiative",
-//     logo: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "NGO",
-//   },
-//   {
-//     id: 3,
-//     name: "TechForGood",
-//     logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "Corporate Partner",
-//   },
-//   {
-//     id: 4,
-//     name: "EduWorld Foundation",
-//     logo: "https://images.unsplash.com/photo-1572021335469-31706a17aaef?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "Foundation",
-//   },
-//   {
-//     id: 5,
-//     name: "Clean Water Alliance",
-//     logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "NGO",
-//   },
-//   {
-//     id: 6,
-//     name: "Global Bank",
-//     logo: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-//     type: "Corporate Partner",
-//   },
-// ];
-
-// const milestones = [
-//   {
-//     year: 2005,
-//     title: "Foundation Established",
-//     description:
-//       "RWWS was established with a mission to create sustainable change in underserved communities.",
-//   },
-//   {
-//     year: 2008,
-//     title: "First Water Project",
-//     description:
-//       "Completed our first clean water project, providing access to safe drinking water for 5,000 people.",
-//   },
-//   {
-//     year: 2010,
-//     title: "Education Initiative Launch",
-//     description:
-//       "Launched our Education for All initiative, building 10 schools and training 50 teachers.",
-//   },
-//   {
-//     year: 2013,
-//     title: "Healthcare Program Expansion",
-//     description:
-//       "Expanded healthcare programs to 5 countries, establishing 15 community health centers.",
-//   },
-//   {
-//     year: 2016,
-//     title: "Humanitarian Award",
-//     description:
-//       "Received the Global Humanitarian Award for our work in disaster relief and recovery.",
-//   },
-//   {
-//     year: 2019,
-//     title: "One Million Lives Impacted",
-//     description:
-//       "Reached the milestone of positively impacting one million lives through our various programs.",
-//   },
-//   {
-//     year: 2022,
-//     title: "Climate Resilience Initiative",
-//     description:
-//       "Launched a new initiative focused on helping communities adapt to climate change.",
-//   },
-//   {
-//     year: 2024,
-//     title: "Digital Inclusion Program",
-//     description:
-//       "Started a digital literacy program to bridge the technology gap in underserved communities.",
-//   },
-// ];
-
-export async function getServerSideProps() {
-  const [teamData, partnersData, milestonesData] = await Promise.all([
-    fetchTeamMembers(),
-    fetchPartners(),
-    fetchMilestones(),
-  ]);
-
-  return {
-    props: {
-      team: teamData.items,
-      partners: partnersData.items,
-      milestones: milestonesData.items,
-    },
-  };
-}
-
-export default function AboutPage({ team, partners, milestones }) {
+export default function AboutPage({ homeContent }) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -187,7 +50,7 @@ export default function AboutPage({ team, partners, milestones }) {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="Team working together"
             fill
             style={{ objectFit: "cover" }}
@@ -204,9 +67,9 @@ export default function AboutPage({ team, partners, milestones }) {
           </div>
         </div>
       </section>
+      <h3 className="text-6xl text-center font-bold mt-60">Coming Soon</h3>
 
-      {/* Mission & Vision */}
-      <section className="py-16 bg-background">
+      {/* <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
@@ -269,7 +132,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Our Approach */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -328,7 +190,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Our Team */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -370,7 +231,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Our History */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -387,7 +247,6 @@ export default function AboutPage({ team, partners, milestones }) {
             </p>
           </div>
           <div className="relative">
-            {/* Timeline line */}
             <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-border"></div>
 
             <div className="space-y-12">
@@ -400,7 +259,6 @@ export default function AboutPage({ team, partners, milestones }) {
                 >
                   <div className="flex-1"></div>
 
-                  {/* Timeline dot */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-primary flex items-center justify-center z-10">
                     <Calendar className="h-4 w-4 text-primary-foreground" />
                   </div>
@@ -431,7 +289,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Partners & Supporters */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -545,7 +402,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Financial Transparency */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -611,7 +467,6 @@ export default function AboutPage({ team, partners, milestones }) {
         </div>
       </section>
 
-      {/* Call to Action */}
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">
@@ -639,7 +494,7 @@ export default function AboutPage({ team, partners, milestones }) {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

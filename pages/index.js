@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "../components/ui/button";
 import {
@@ -18,6 +19,9 @@ import {
   Calendar,
   Newspaper,
 } from "lucide-react";
+import { getHome } from "@/lib/api";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
 // Mock data (would come from API in production)
 const impactStories = [
@@ -95,30 +99,67 @@ const programs = [
   },
 ];
 
-export default function Home() {
+export async function getStaticProps() {
+  try {
+    const homeData = await getHome(1, 10);
+    return {
+      props: {
+        homeContent: homeData.content[0] || null,
+      },
+      revalidate: 3600, // ISR revalidation
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      props: {
+        homeContent: null,
+      },
+    };
+  }
+}
+
+export default function Home({ homeContent }) {
+  const [loading, setLoading] = useState(true);
+  console.log(homeContent);
+
+  useEffect(() => {
+    if (homeContent) setLoading(false);
+  }, [homeContent]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!homeContent) {
+    return <div className="text-center py-8">Failed to load content</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary to-chart-3 text-white py-20 md:py-32">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-30"></div>
-          <Image
-            src="https://images.unsplash.com/photo-1593113630400-ea4288922497?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-            alt="People helping each other"
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-          />
+          {homeContent.hero_image && (
+            <Image
+              src={`${BASE_URL}${homeContent.hero_image}`}
+              alt={homeContent.hero_headline}
+              fill
+              style={{ objectFit: "cover" }}
+              priority
+            />
+          )}
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Making a Difference Together
+              {homeContent.hero_headline}
             </h1>
-            <p className="text-xl md:text-2xl mb-8">
-              Join us in our mission to create lasting change and empower
-              communities worldwide.
-            </p>
+            <p className="text-xl md:text-2xl mb-8">{homeContent.cta_text}</p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 asChild
@@ -146,24 +187,15 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">Our Mission & Vision</h2>
-              <p className="text-lg mb-6">
-                At RWWS, we believe in creating a world where every person has
-                access to the basic necessities of life and the opportunity to
-                thrive. Our mission is to empower communities through
-                sustainable development programs and immediate relief efforts.
-              </p>
-              <p className="text-lg mb-6">
-                We envision a future where poverty is eliminated, education is
-                accessible to all, and communities are self-sufficient and
-                resilient in the face of challenges.
-              </p>
+              <p className="text-lg mb-6">{homeContent.mission}</p>
+              <p className="text-lg mb-6">{homeContent.vision}</p>
               <Button asChild variant="outline">
                 <Link href="/about">Learn More About Us</Link>
               </Button>
             </div>
             <div className="relative h-80 md:h-96 rounded-lg overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
+                src={`${BASE_URL}${homeContent.images[0]}`}
                 alt="Community gathering"
                 fill
                 style={{ objectFit: "cover" }}

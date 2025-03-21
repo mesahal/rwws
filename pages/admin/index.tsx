@@ -89,8 +89,7 @@ export default function AdminDashboard() {
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <Card key={index}>
               <CardContent className="p-6">
@@ -122,9 +121,7 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Donations */}
           <Card>
             <CardHeader>
               <CardTitle>Recent Donations</CardTitle>
@@ -154,7 +151,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Pending Aid Requests */}
           <Card>
             <CardHeader>
               <CardTitle>Pending Aid Requests</CardTitle>
@@ -181,7 +177,7 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </AdminLayout>
   );
