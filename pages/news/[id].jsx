@@ -105,7 +105,7 @@ export default function NewsDetailPage({ newsItem }) {
               asChild
               variant="outline"
               size="sm"
-              className="mb-6 border-white text-white hover:bg-white hover:text-primary"
+              className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
             >
               <Link href="/news">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to News

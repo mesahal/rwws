@@ -100,13 +100,8 @@ export default function ContentManagement() {
     //   title: "Blog Posts",
     //   icon: <FileText className="h-4 w-4 mr-2" />,
     // },
-    programs: {
-      categories: [
-        "Water & Sanitation",
-        "Education",
-        "Healthcare",
-        "Economic Development",
-      ],
+    program: {
+      categories: ["1", "2", "3"],
       title: "Programs",
       icon: <BookOpen className="h-4 w-4 mr-2" />,
     },
@@ -120,13 +115,8 @@ export default function ContentManagement() {
     //   title: "Reports",
     //   icon: <FileSpreadsheet className="h-4 w-4 mr-2" />,
     // },
-    impact: {
-      categories: [
-        "Community Stories",
-        "Project Outcomes",
-        "Testimonials",
-        "Case Studies",
-      ],
+    story: {
+      categories: ["1", "2", "3"],
       title: "Impact Stories",
       icon: <Heart className="h-4 w-4 mr-2" />,
     },
@@ -143,7 +133,9 @@ export default function ContentManagement() {
       // const data = await response.json();
       const data = response.data;
       console.log(data);
-      setContentItems(data.newsList);
+      if (activeTab == "news") setContentItems(data.newsList);
+      else if (activeTab == "story") setContentItems(data.storyList);
+      else if (activeTab == "program") setContentItems(data.programList);
       setTotalPages(Math.ceil(data.total_count / pageSize));
     } catch (error) {
       toast({
@@ -158,8 +150,8 @@ export default function ContentManagement() {
 
   const categoryMap = {
     news: 1,
-    impact: 2,
-    programs: 3,
+    story: 2,
+    program: 3,
   };
 
   const handleCreate = async (activeTab) => {
@@ -326,110 +318,6 @@ export default function ContentManagement() {
     setSelectedItem(null);
   };
 
-  // const openEditDialog = (item) => {
-  //   setSelectedItem(item);
-  //   setFormData({
-  //     title: item.title,
-  //     excerpt: item.excerpt,
-  //     content: item.content,
-  //     category: item.category,
-  //     status: item.status,
-  //     image: null,
-  //   });
-  //   setIsEditDialogOpen(true);
-  // };
-
-  // const ContentForm = ({ mode }) => (
-  //   <div className="space-y-4 mt-4">
-  //     <div>
-  //       <Label htmlFor="title">Title</Label>
-  //       <Input
-  //         id="title"
-  //         value={formData.title}
-  //         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-  //         placeholder="Enter title"
-  //       />
-  //     </div>
-  //     <div>
-  //       <Label htmlFor="excerpt">Excerpt</Label>
-  //       <Textarea
-  //         id="excerpt"
-  //         value={formData.excerpt}
-  //         onChange={(e) =>
-  //           setFormData({ ...formData, excerpt: e.target.value })
-  //         }
-  //         placeholder="Enter excerpt"
-  //       />
-  //     </div>
-  //     <div>
-  //       <Label htmlFor="content">Content</Label>
-  //       <Textarea
-  //         id="content"
-  //         value={formData.content}
-  //         onChange={(e) =>
-  //           setFormData({ ...formData, content: e.target.value })
-  //         }
-  //         placeholder="Enter content"
-  //         className="min-h-[200px]"
-  //       />
-  //     </div>
-  //     <div>
-  //       <Label htmlFor="category">Category</Label>
-  //       <Select
-  //         value={formData.category}
-  //         onValueChange={(value) =>
-  //           setFormData({ ...formData, category: value })
-  //         }
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue placeholder="Select category" />
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           {contentTypes[activeTab].categories.map((category) => (
-  //             <SelectItem key={category} value={category}>
-  //               {category}
-  //             </SelectItem>
-  //           ))}
-  //         </SelectContent>
-  //       </Select>
-  //     </div>
-  //     <div>
-  //       <Label htmlFor="status">Status</Label>
-  //       <Select
-  //         value={formData.status}
-  //         onValueChange={(value) => setFormData({ ...formData, status: value })}
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue placeholder="Select status" />
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           <SelectItem value="draft">Draft</SelectItem>
-  //           <SelectItem value="published">Published</SelectItem>
-  //           <SelectItem value="archived">Archived</SelectItem>
-  //         </SelectContent>
-  //       </Select>
-  //     </div>
-  //     <div>
-  //       <Label htmlFor="image">Image</Label>
-  //       <Input
-  //         id="image"
-  //         type="file"
-  //         accept="image/*"
-  //         onChange={(e) =>
-  //           setFormData({ ...formData, image: e.target.files?.[0] || null })
-  //         }
-  //       />
-  //     </div>
-  //     <Button
-  //       onClick={mode === "create" ? handleCreate : handleUpdate}
-  //       className="w-full"
-  //     >
-  //       {mode === "create" ? "Create" : "Update"}{" "}
-  //       {contentTypes[activeTab].title}
-  //     </Button>
-  //   </div>
-  // );
-
   const getFormFields = () => {
     switch (activeTab) {
       case "news":
@@ -497,7 +385,7 @@ export default function ContentManagement() {
           </>
         );
 
-      case "impact":
+      case "story":
         return (
           <>
             <div>
@@ -534,7 +422,7 @@ export default function ContentManagement() {
                 className="min-h-[200px]"
               />
             </div>
-            <div>
+            {/* <div>
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category_id.toString()}
@@ -546,7 +434,7 @@ export default function ContentManagement() {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {contentTypes.impact.categories.map((category) => (
+                  {contentTypes.story.categories.map((category) => (
                     <SelectItem
                       key={category.id}
                       value={category.id.toString()}
@@ -556,7 +444,7 @@ export default function ContentManagement() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
             <div>
               <Label htmlFor="location">Location</Label>
               <Input
@@ -582,7 +470,7 @@ export default function ContentManagement() {
           </>
         );
 
-      case "programs":
+      case "program":
         return (
           <>
             <div>
@@ -619,7 +507,7 @@ export default function ContentManagement() {
                 className="min-h-[200px]"
               />
             </div>
-            <div>
+            {/* <div>
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category_id.toString()}
@@ -631,7 +519,7 @@ export default function ContentManagement() {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {contentTypes.programs.categories.map((category) => (
+                  {contentTypes.program.categories.map((category) => (
                     <SelectItem
                       key={category.id}
                       value={category.id.toString()}
@@ -641,7 +529,7 @@ export default function ContentManagement() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
             <div>
               <Label htmlFor="goals">Goals</Label>
               <Textarea
@@ -801,10 +689,10 @@ export default function ContentManagement() {
             {/* <TabsTrigger value="blogs">
               <FileText className="h-4 w-4 mr-2" /> Blogs
             </TabsTrigger> */}
-            <TabsTrigger value="programs">
+            <TabsTrigger value="program">
               <BookOpen className="h-4 w-4 mr-2" /> Programs
             </TabsTrigger>
-            <TabsTrigger value="impact">
+            <TabsTrigger value="story">
               <Heart className="h-4 w-4 mr-2" /> Impact Stories
             </TabsTrigger>
             {/* <TabsTrigger value="reports">
