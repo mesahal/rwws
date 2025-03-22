@@ -9,15 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ArrowRight,
-  Globe,
-  BookOpen,
-  Users,
-  Heart,
-  Shield,
-} from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -26,8 +17,11 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../../components/ui/pagination";
-import { getAll } from "../../lib/api";
+} from "@/components/ui/pagination";
+import { ArrowRight, Calendar } from "lucide-react";
+import { getAll } from "@/lib/api";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
 export const metadata = {
   title: "Programs & Initiatives - RWWS",
@@ -35,7 +29,36 @@ export const metadata = {
     "Explore our ongoing and past projects focused on sustainable development and humanitarian aid",
 };
 
-export default function ProgramsPage() {
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const pageSize = 6;
+
+export async function getServerSideProps(context) {
+  const page = context.query.page ? parseInt(context.query.page) : 1;
+  try {
+    const response = await getAll(page, pageSize, "program");
+    const { programList, total_count } = response.data;
+    return {
+      props: {
+        programs: programList,
+        totalPages: Math.ceil(total_count / pageSize),
+        page,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    return { props: { programs: [], totalPages: 1, page: 1 } };
+  }
+}
+
+export default function ProgramsPage({ programs, totalPages, page }) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -61,282 +84,118 @@ export default function ProgramsPage() {
         </div>
       </section>
 
-      {/* Programs Overview */}
-      <section className="py-16 bg-background">
+      {/* Programs Grid */}
+      <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Approach</h2>
-            <p className="text-lg max-w-3xl mx-auto">
-              We implement sustainable, community-led programs that address
-              immediate needs while building long-term resilience and
-              self-sufficiency.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto mb-4">
-                  <Users className="h-10 w-10 text-chart-1" />
-                </div>
-                <CardTitle>Community-Led</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  We work directly with communities to understand their unique
-                  needs and priorities, ensuring local ownership and
-                  sustainability of all projects.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto mb-4">
-                  <Globe className="h-10 w-10 text-chart-2" />
-                </div>
-                <CardTitle>Sustainable Solutions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Our programs are designed to create lasting change by
-                  addressing root causes, not just symptoms, and building local
-                  capacity for continued progress.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center">
-              <CardHeader>
-                <div className="mx-auto mb-4">
-                  <Heart className="h-10 w-10 text-chart-3" />
-                </div>
-                <CardTitle>Holistic Impact</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  We recognize the interconnected nature of development
-                  challenges and implement integrated programs that address
-                  multiple aspects of community wellbeing.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Program Categories */}
-      <section className="py-16 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Programs</h2>
-            <p className="text-lg max-w-3xl mx-auto">
-              Explore our diverse range of programs addressing critical needs in
-              communities worldwide.
-            </p>
-          </div>
-
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-              <TabsTrigger value="all">All Programs</TabsTrigger>
-              <TabsTrigger value="ongoing">Ongoing</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="all">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {programs.map((program) => (
-                  <Card key={program.id} className="overflow-hidden">
-                    <div className="relative h-48">
-                      <Image
-                        src={program.image}
-                        alt={program.title}
-                        fill
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                        {program.category}
-                      </div>
-                      <div className="absolute bottom-2 left-2 bg-background/80 text-foreground px-2 py-1 rounded text-xs font-medium">
-                        {program.status}
-                      </div>
-                    </div>
-                    <CardHeader>
-                      <CardTitle>{program.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription>{program.description}</CardDescription>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild variant="ghost" className="w-full">
-                        <Link href={`/programs/${program.id}`}>
-                          Learn More <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="ongoing">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {programs
-                  .filter((p) => p.status === "Ongoing")
-                  .map((program) => (
-                    <Card key={program.id} className="overflow-hidden">
-                      <div className="relative h-48">
-                        <Image
-                          src={program.image}
-                          alt={program.title}
-                          fill
-                          style={{ objectFit: "cover" }}
-                        />
-                        <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                          {program.category}
-                        </div>
-                      </div>
-                      <CardHeader>
-                        <CardTitle>{program.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription>{program.description}</CardDescription>
-                      </CardContent>
-                      <CardFooter>
-                        <Button asChild variant="ghost" className="w-full">
-                          <Link href={`/programs/${program.id}`}>
-                            Learn More <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="completed">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {programs.filter((p) => p.status === "Completed").length > 0 ? (
-                  programs
-                    .filter((p) => p.status === "Completed")
-                    .map((program) => (
-                      <Card key={program.id} className="overflow-hidden">
-                        <div className="relative h-48">
-                          <Image
-                            src={program.image}
-                            alt={program.title}
-                            fill
-                            style={{ objectFit: "cover" }}
-                          />
-                          <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                            {program.category}
-                          </div>
-                        </div>
-                        <CardHeader>
-                          <CardTitle>{program.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <CardDescription>
-                            {program.description}
-                          </CardDescription>
-                        </CardContent>
-                        <CardFooter>
-                          <Button asChild variant="ghost" className="w-full">
-                            <Link href={`/programs/${program.id}`}>
-                              Learn More <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    ))
-                ) : (
-                  <div className="col-span-3 text-center py-12">
-                    <p className="text-muted-foreground">
-                      No completed programs to display at this time.
-                    </p>
+          {/* Featured Program (first item) */}
+          {page === 1 && programs.length > 0 && (
+            <div className="mb-12">
+              <Card className="overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  <div className="relative h-64 md:h-auto">
+                    <Image
+                      src={`${BASE_URL}${programs[0].image}`}
+                      alt={programs[0].title}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
                   </div>
+                  <div className="p-6 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center text-muted-foreground mb-2">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        <span className="text-sm">
+                          Started {formatDate(programs[0].start_date)}
+                        </span>
+                        <span className="mx-2">•</span>
+                        <span className="text-sm">{programs[0].status}</span>
+                      </div>
+                      <h2 className="text-2xl font-bold mb-4">
+                        {programs[0].title}
+                      </h2>
+                      <p className="text-muted-foreground mb-6 line-clamp-2">
+                        {programs[0].description}
+                      </p>
+                    </div>
+                    <Button asChild>
+                      <Link href={`/programs/${programs[0].id}`}>
+                        Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Programs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {programs.map((program) => (
+              <Card key={program.id} className="overflow-hidden">
+                <div className="relative h-48">
+                  <Image
+                    src={`${BASE_URL}${program.image}`}
+                    alt={program.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                  <div className="absolute bottom-2 left-2 bg-background/80 text-foreground px-2 py-1 rounded text-xs font-medium">
+                    {program.status}
+                  </div>
+                </div>
+                <CardHeader>
+                  <div className="flex items-center text-muted-foreground mb-2">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span className="text-sm">
+                      {formatDate(program.start_date)}
+                    </span>
+                  </div>
+                  <CardTitle>{program.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="line-clamp-2">
+                    {program.description}
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild variant="ghost" className="w-full">
+                    <Link href={`/programs/${program.id}`}>
+                      Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-12">
+            <Pagination>
+              <PaginationContent>
+                {page > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious href={`/programs?page=${page - 1}`} />
+                  </PaginationItem>
                 )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
 
-      {/* Impact Statistics */}
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Impact</h2>
-            <p className="text-lg max-w-3xl mx-auto">
-              Through our programs, we've made a significant difference in
-              communities worldwide.
-            </p>
-          </div>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href={`/programs?page=${i + 1}`}
+                      isActive={page === i + 1}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-4xl font-bold text-primary mb-2">2M+</div>
-                <p className="text-muted-foreground">Lives Impacted</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-4xl font-bold text-primary mb-2">50+</div>
-                <p className="text-muted-foreground">Countries Served</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-4xl font-bold text-primary mb-2">500+</div>
-                <p className="text-muted-foreground">Projects Completed</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-4xl font-bold text-primary mb-2">15+</div>
-                <p className="text-muted-foreground">Years of Service</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Get Involved */}
-      <section className="py-16 bg-primary text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Get Involved</h2>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
-            There are many ways to support our programs and make a difference in
-            communities worldwide.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-primary hover:bg-gray-100"
-            >
-              <Link href="/donate">Donate Now</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary"
-            >
-              <Link href="/contact">Volunteer</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary"
-            >
-              <Link href="/contact">Partner With Us</Link>
-            </Button>
+                {page < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext href={`/programs?page=${page + 1}`} />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
           </div>
         </div>
       </section>
