@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -71,7 +71,7 @@ export async function getStaticProps({ params }) {
 export default function NewsDetailPage({ newsItem }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  console.log(newsItem);
+
   if (router.isFallback) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -167,7 +167,7 @@ export default function NewsDetailPage({ newsItem }) {
                   </p>
                   <Button
                     asChild
-                    className="w-full bg-white text-primary hover:bg-gray-100"
+                    className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
                   >
                     <Link href="/donate">Donate Now</Link>
                   </Button>

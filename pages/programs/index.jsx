@@ -18,172 +18,22 @@ import {
   Heart,
   Shield,
 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../components/ui/pagination";
+import { getAll } from "../../lib/api";
 
 export const metadata = {
   title: "Programs & Initiatives - RWWS",
   description:
     "Explore our ongoing and past projects focused on sustainable development and humanitarian aid",
 };
-
-// Mock data (would come from API in production)
-const programs = [
-  {
-    id: 1,
-    title: "Clean Water Initiative",
-    description:
-      "Providing sustainable clean water solutions to communities facing water scarcity and contamination.",
-    longDescription:
-      "Our Clean Water Initiative focuses on developing sustainable water solutions for communities facing severe water scarcity and contamination. Through a combination of well-drilling, rainwater harvesting systems, and water purification technologies, we ensure that communities have reliable access to safe drinking water. Each project includes community training on maintenance and water management to ensure long-term sustainability.",
-    image:
-      "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Water & Sanitation",
-    status: "Ongoing",
-    locations: ["East Africa", "South Asia", "Latin America"],
-    beneficiaries: "500,000+ people across 100+ communities",
-    startDate: "January 2018",
-    goals: [
-      "Provide clean water access to 1 million people by 2026",
-      "Reduce waterborne diseases by 80% in target communities",
-      "Train 1,000 local technicians in water system maintenance",
-    ],
-    achievements: [
-      "Completed 100 water projects serving over 500,000 people",
-      "Reduced waterborne diseases by 65% in completed project areas",
-      "Trained 450 local technicians in water system maintenance",
-    ],
-    icon: <Globe className="h-10 w-10 text-chart-1" />,
-  },
-  {
-    id: 2,
-    title: "Education for All",
-    description:
-      "Ensuring quality education for underprivileged children through school construction, teacher training, and educational resources.",
-    longDescription:
-      "Our Education for All program works to break the cycle of poverty through quality education. We build and renovate schools, train teachers, provide educational materials, and implement innovative teaching methodologies. Our holistic approach addresses not just academic needs but also nutrition, health, and community engagement to ensure children can learn effectively.",
-    image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Education",
-    status: "Ongoing",
-    locations: ["West Africa", "South Asia", "Southeast Asia"],
-    beneficiaries: "250,000+ children in 500+ schools",
-    startDate: "March 2015",
-    goals: [
-      "Provide quality education to 500,000 children by 2027",
-      "Achieve 95% literacy rate in target communities",
-      "Train 10,000 teachers in modern teaching methodologies",
-    ],
-    achievements: [
-      "Built or renovated 500 schools serving 250,000+ children",
-      "Increased school attendance by 40% in project areas",
-      "Trained 5,000+ teachers in modern teaching methodologies",
-    ],
-    icon: <BookOpen className="h-10 w-10 text-chart-2" />,
-  },
-  {
-    id: 3,
-    title: "Community Healthcare",
-    description:
-      "Bringing essential healthcare services to remote areas through mobile clinics, health worker training, and preventive care.",
-    longDescription:
-      "Our Community Healthcare program focuses on making quality healthcare accessible to all, especially in remote and underserved areas. We operate mobile clinics, train community health workers, establish permanent health centers, and implement preventive health education programs. Our approach emphasizes building local capacity for sustainable healthcare systems.",
-    image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Healthcare",
-    status: "Ongoing",
-    locations: ["East Africa", "South Asia", "Southeast Asia"],
-    beneficiaries: "750,000+ people across 300+ communities",
-    startDate: "June 2016",
-    goals: [
-      "Provide healthcare access to 1.5 million people by 2028",
-      "Reduce maternal and child mortality by 70% in target areas",
-      "Train 5,000 community health workers",
-    ],
-    achievements: [
-      "Established 50 permanent health centers and 30 mobile clinics",
-      "Reduced maternal mortality by 45% in project areas",
-      "Trained 2,200 community health workers",
-    ],
-    icon: <Users className="h-10 w-10 text-chart-3" />,
-  },
-  {
-    id: 4,
-    title: "Women's Empowerment",
-    description:
-      "Supporting women through skills training, microfinance, and advocacy to promote gender equality and economic independence.",
-    longDescription:
-      "Our Women's Empowerment program works to create opportunities for women to achieve economic independence and social equality. Through vocational training, microfinance initiatives, leadership development, and advocacy, we help women build sustainable livelihoods and become agents of change in their communities.",
-    image:
-      "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Economic Development",
-    status: "Ongoing",
-    locations: ["West Africa", "South Asia", "Latin America"],
-    beneficiaries: "100,000+ women across 200+ communities",
-    startDate: "September 2017",
-    goals: [
-      "Empower 250,000 women economically by 2026",
-      "Achieve 50% female representation in community leadership",
-      "Establish 1,000 women-led businesses",
-    ],
-    achievements: [
-      "Trained 100,000+ women in vocational skills",
-      "Provided microloans to 50,000+ women entrepreneurs",
-      "Established 450+ women-led businesses",
-    ],
-    icon: <Heart className="h-10 w-10 text-chart-4" />,
-  },
-  {
-    id: 5,
-    title: "Emergency Relief",
-    description:
-      "Providing immediate assistance to communities affected by natural disasters, conflicts, and humanitarian crises.",
-    longDescription:
-      "Our Emergency Relief program delivers rapid response to communities affected by natural disasters, conflicts, and other humanitarian crises. We provide immediate necessities like food, water, shelter, and medical care, while also implementing early recovery initiatives to help communities rebuild and become more resilient to future disasters.",
-    image:
-      "https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Humanitarian Aid",
-    status: "Ongoing",
-    locations: ["Global"],
-    beneficiaries: "2 million+ people across 20+ countries",
-    startDate: "January 2010",
-    goals: [
-      "Respond to emergencies within 72 hours",
-      "Provide comprehensive relief to 500,000 people annually",
-      "Implement disaster preparedness in 1,000 vulnerable communities",
-    ],
-    achievements: [
-      "Responded to 50+ major disasters across 25 countries",
-      "Provided emergency relief to 2 million+ people",
-      "Implemented disaster preparedness in 500+ communities",
-    ],
-    icon: <Shield className="h-10 w-10 text-chart-5" />,
-  },
-  {
-    id: 6,
-    title: "Sustainable Agriculture",
-    description:
-      "Promoting food security through climate-smart farming techniques, training, and market access for small-scale farmers.",
-    longDescription:
-      "Our Sustainable Agriculture program works to enhance food security and farmer livelihoods through climate-smart agricultural practices. We provide training in sustainable farming techniques, distribute improved seeds and tools, facilitate market access, and implement irrigation systems to help farmers increase productivity while preserving natural resources.",
-    image:
-      "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-    category: "Food Security",
-    status: "Ongoing",
-    locations: ["East Africa", "West Africa", "South Asia"],
-    beneficiaries: "300,000+ farmers across 500+ communities",
-    startDate: "April 2014",
-    goals: [
-      "Train 500,000 farmers in sustainable agriculture by 2027",
-      "Increase crop yields by 100% in target communities",
-      "Establish 200 farmer cooperatives for improved market access",
-    ],
-    achievements: [
-      "Trained 300,000+ farmers in sustainable agriculture",
-      "Increased average crop yields by 65% in project areas",
-      "Established 120 farmer cooperatives",
-    ],
-    icon: <Globe className="h-10 w-10 text-chart-1" />,
-  },
-];
 
 export default function ProgramsPage() {
   return (

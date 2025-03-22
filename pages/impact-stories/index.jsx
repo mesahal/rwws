@@ -210,7 +210,7 @@ export default function ImpactStories({ storyItems, totalPages, page }) {
 
                 {page < totalPages && (
                   <PaginationItem>
-                    <PaginationNext href={`/story?page=${page + 1}`} />
+                    <PaginationNext href={`/impact-stories?page=${page + 1}`} />
                   </PaginationItem>
                 )}
               </PaginationContent>
