@@ -69,7 +69,7 @@ const Footer = () => {
                   Impact Stories
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/financial-reports"
                   className="text-muted-foreground hover:text-primary"
@@ -84,7 +84,7 @@ const Footer = () => {
                 >
                   FAQ
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -109,7 +109,7 @@ const Footer = () => {
                   Apply for Aid
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/events"
                   className="text-muted-foreground hover:text-primary"
@@ -124,7 +124,7 @@ const Footer = () => {
                 >
                   Blog
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/contact"
