@@ -11,81 +11,18 @@ import {
 } from "@/components/ui/card";
 import { ArrowRight, Filter } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../components/ui/pagination";
+import { getAll } from "../../lib/api";
 
-// Mock data (would come from API in production)
-const impactStories = [
-  {
-    id: 1,
-    title: "Clean Water for Rural Village",
-    excerpt:
-      "How our water project transformed the lives of 500 families in a remote village.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Water & Sanitation",
-    location: "East Africa",
-  },
-  {
-    id: 2,
-    title: "Education for All Initiative",
-    excerpt:
-      "Providing quality education to 1,000 underprivileged children in urban areas.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Education",
-    location: "South Asia",
-  },
-  {
-    id: 3,
-    title: "Healthcare Outreach Program",
-    excerpt:
-      "Mobile clinics bringing essential healthcare to remote communities.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Healthcare",
-    location: "Latin America",
-  },
-  {
-    id: 4,
-    title: "Sustainable Farming Project",
-    excerpt:
-      "Teaching sustainable farming techniques to improve food security.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Agriculture",
-    location: "West Africa",
-  },
-  {
-    id: 5,
-    title: "Women's Empowerment Program",
-    excerpt: "Providing skills training and microloans to women entrepreneurs.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Economic Development",
-    location: "South Asia",
-  },
-  {
-    id: 6,
-    title: "Disaster Relief Efforts",
-    excerpt:
-      "Providing emergency aid to communities affected by natural disasters.",
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image:
-      "https://images.unsplash.com/photo-1469571486292-b53601010376?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Emergency Relief",
-    location: "Southeast Asia",
-  },
-];
+const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
 const categories = [
   "All",
@@ -105,13 +42,42 @@ const locations = [
   "Latin America",
 ];
 
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
 export const metadata = {
   title: "Impact Stories - RWWS",
   description:
     "Real stories of how our programs are changing lives and communities around the world",
 };
-
-export default function ImpactStories() {
+const pageSize = 6;
+// ✅ Fetch news on each request (SSR)
+export async function getServerSideProps(context) {
+  const page = context.query.page ? parseInt(context.query.page) : 1;
+  try {
+    // const response = await newsService.getAll(page, 10);
+    const response = await getAll(page, pageSize, "story");
+    console.log(response);
+    const { storyList, total_count } = response.data; // ✅ Correct Destructuring
+    return {
+      props: {
+        storyItems: storyList,
+        totalPages: Math.ceil(total_count / pageSize),
+        page,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    return { props: { storyItems: [], totalPages: 1, page: 1 } };
+  }
+}
+export default function ImpactStories({ storyItems, totalPages, page }) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -138,7 +104,7 @@ export default function ImpactStories() {
       </section>
 
       {/* Filters */}
-      <section className="py-8 bg-muted">
+      {/* <section className="py-8 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center">
@@ -181,27 +147,27 @@ export default function ImpactStories() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Stories Grid */}
       <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {impactStories.map((story) => (
+            {storyItems.map((story) => (
               <Card key={story.id} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
-                    src={story.image}
+                    src={`${BASE_URL}${story.image}`}
                     alt={story.title}
                     fill
                     style={{ objectFit: "cover" }}
                   />
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                  {/* <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                     {story.category}
                   </div>
                   <div className="absolute bottom-2 left-2 bg-background/80 text-foreground px-2 py-1 rounded text-xs font-medium">
                     {story.location}
-                  </div>
+                  </div> */}
                 </div>
                 <CardHeader>
                   <CardTitle>{story.title}</CardTitle>
@@ -218,6 +184,37 @@ export default function ImpactStories() {
                 </CardFooter>
               </Card>
             ))}
+          </div>
+          {/* Pagination */}
+          <div className="mt-12">
+            <Pagination>
+              <PaginationContent>
+                {page > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href={`/impact-stories?page=${page - 1}`}
+                    />
+                  </PaginationItem>
+                )}
+
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      href={`/impact-stories?page=${i + 1}`}
+                      isActive={page === i + 1}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                {page < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext href={`/story?page=${page + 1}`} />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
           </div>
         </div>
       </section>

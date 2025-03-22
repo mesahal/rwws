@@ -38,6 +38,7 @@ import {
   Heart,
 } from "lucide-react";
 import AdminLayout from "../layout";
+import { title } from "process";
 // Content type interfaces
 // interface ContentItem {
 //   id: string
@@ -154,37 +155,105 @@ export default function ContentManagement() {
     program: 3,
   };
 
-  const handleCreate = async (activeTab) => {
-    formData.category = categoryMap[activeTab] || null;
-    console.log(formData);
-    if (!formData.title || !formData.excerpt || !formData.category) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      });
-      return;
+  const constructFormData = () => {
+    const formDataToSend = new FormData();
+    const baseData = {
+      title: formData.title,
+      category_id: formData.category,
+    };
+
+    let typeSpecificData = {};
+
+    switch (activeTab) {
+      case "news":
+        typeSpecificData = {
+          title: formData.title,
+          excerpt: formData.excerpt,
+        };
+        break;
+
+      case "story":
+        typeSpecificData = {
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content,
+          location: formData.location,
+          video: formData.video,
+        };
+        break;
+
+      case "program":
+        typeSpecificData = {
+          title: formData.title,
+          description: formData.description,
+          long_description: formData.long_description,
+          goals: formData.goals,
+          achievements: formData.achievements,
+          locations: formData.locations,
+          video: formData.video,
+          status: formData.status,
+          start_date: formData.start_date,
+        };
+        break;
     }
 
-    const formDataToSend = new FormData();
     if (formData.image) {
       formDataToSend.append("image", formData.image);
     }
+
     formDataToSend.append(
       "jsonData",
       JSON.stringify({
-        title: formData.title,
-        excerpt: formData.excerpt,
-        // content: formData.content,
-        category_id: formData.category,
-        // status: formData.status,
+        ...baseData,
+        ...typeSpecificData,
       })
     );
-    console.log(formDataToSend);
+
+    return formDataToSend;
+  };
+
+  const validateForm = () => {
+    const requiredFields = {
+      news: ["title", "excerpt"],
+      story: ["title", "excerpt", "content", "location", "video"],
+      program: [
+        "title",
+        "description",
+        "description",
+        "long_description",
+        "goals",
+        "achievements",
+        "locations",
+        "status",
+        "start_date",
+      ],
+    };
+
+    const missingFields = requiredFields[activeTab].filter(
+      (field) => !formData[field]
+    );
+
+    if (missingFields.length > 0) {
+      toast({
+        title: "Error",
+        description: `Missing required fields: ${missingFields.join(", ")}`,
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleCreate = async (activeTab) => {
+    formData.category = categoryMap[activeTab] || null;
+    console.log(formData);
+    if (!validateForm()) return;
+
     try {
+      const formDataToSend = constructFormData();
       const response = await create(formDataToSend, activeTab);
       const data = response;
-
+      console.log(data);
       if (data.success) {
         toast({
           title: "Success",
@@ -223,37 +292,10 @@ export default function ContentManagement() {
   const handleUpdate = async () => {
     formData.category = categoryMap[activeTab] || null;
 
-    if (
-      !selectedItem ||
-      !formData.title ||
-      !formData.excerpt ||
-      !formData.category
-    ) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const formDataToSend = new FormData();
-    console.log(formDataToSend);
-    if (formData.image) {
-      formDataToSend.append("image", formData.image);
-    }
-    formDataToSend.append(
-      "jsonData",
-      JSON.stringify({
-        title: formData.title,
-        excerpt: formData.excerpt,
-        // content: formData.content,
-        category_id: formData.category,
-        // status: formData.status,
-      })
-    );
+    if (!selectedItem || !validateForm()) return;
 
     try {
+      const formDataToSend = constructFormData();
       const response = await update(selectedItem.id, formDataToSend, activeTab);
       const data = response;
 
@@ -467,6 +509,20 @@ export default function ContentManagement() {
                 placeholder="Enter video URL"
               />
             </div>
+            <div>
+              <Label htmlFor="image">Image</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    image: e.target.files?.[0] || null,
+                  })
+                }
+              />
+            </div>
           </>
         );
 
@@ -609,6 +665,20 @@ export default function ContentManagement() {
                 value={formData.start_date}
                 onChange={(e) =>
                   setFormData({ ...formData, start_date: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="image">Image</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    image: e.target.files?.[0] || null,
+                  })
                 }
               />
             </div>
