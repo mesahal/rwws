@@ -20,7 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../../components/ui/pagination";
-import { getAll } from "../../lib/api";
+import { getAll, getHome } from "../../lib/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
@@ -57,27 +57,37 @@ export const metadata = {
     "Real stories of how our programs are changing lives and communities around the world",
 };
 const pageSize = 6;
-// ✅ Fetch news on each request (SSR)
-export async function getServerSideProps(context) {
-  const page = context.query.page ? parseInt(context.query.page) : 1;
+
+export async function getStaticProps() {
+  const page = 1; // Default page for static generation
   try {
-    // const response = await newsService.getAll(page, 10);
+    const homeData = await getHome(1, 10);
+
     const response = await getAll(page, pageSize, "story");
-    console.log(response);
-    const { storyList, total_count } = response.data; // ✅ Correct Destructuring
+    const { storyList, total_count } = response.data;
+    console.log(homeData);
     return {
       props: {
         storyItems: storyList,
         totalPages: Math.ceil(total_count / pageSize),
         page,
+        homeContent: homeData.content[0] || null,
       },
+      revalidate: 3600, // Regenerate every hour (adjust as needed)
     };
   } catch (error) {
-    console.error("Error fetching programs:", error);
-    return { props: { storyItems: [], totalPages: 1, page: 1 } };
+    console.error("Error fetching stories:", error);
+    return {
+      props: { storyItems: [], totalPages: 1, page: 1, homeContent: homeData },
+    };
   }
 }
-export default function ImpactStories({ storyItems, totalPages, page }) {
+export default function ImpactStories({
+  storyItems,
+  totalPages,
+  page,
+  homeContent,
+}) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -85,7 +95,7 @@ export default function ImpactStories({ storyItems, totalPages, page }) {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="People helping each other"
             fill
             style={{ objectFit: "cover" }}

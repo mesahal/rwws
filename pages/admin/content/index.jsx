@@ -82,7 +82,7 @@ export default function ContentManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [contentItems, setContentItems] = useState([]);
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const pageSize = 6;
   useEffect(() => {
     setCurrentPage(1); // Reset to first page when tab changes
@@ -197,7 +197,7 @@ export default function ContentManagement() {
         typeSpecificData = {
           title: formData.title,
           description: formData.description,
-          long_description: formData.long_description,
+          long_description: formData.longDescription,
           goals: formData.goals,
           achievements: formData.achievements,
           locations: formData.locations,
@@ -247,7 +247,7 @@ export default function ContentManagement() {
         "title",
         "description",
         "description",
-        "long_description",
+        "longDescription",
         "goals",
         "achievements",
         "locations",
@@ -281,11 +281,12 @@ export default function ContentManagement() {
   };
 
   const handleCreate = async (activeTab) => {
-    if (activeTab != "home") {
+    if (activeTab !== "home") {
       formData.category = categoryMap[activeTab] || null;
     }
     console.log(formData);
     if (!validateForm()) return;
+    setIsProcessing(true); // Start loading
 
     try {
       const formDataToSend = constructFormData();
@@ -331,6 +332,7 @@ export default function ContentManagement() {
     formData.category = categoryMap[activeTab] || null;
 
     if (!selectedItem || !validateForm()) return;
+    setIsProcessing(true);
 
     try {
       const formDataToSend = constructFormData();
@@ -362,6 +364,7 @@ export default function ContentManagement() {
     if (!confirm("Are you sure you want to delete this item?")) {
       return;
     }
+    setIsProcessing(true);
 
     try {
       const response = await remove(id, activeTab);
@@ -590,12 +593,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="long_description">Long Description</Label>
+              <Label htmlFor="longDescription">Long Description</Label>
               <Textarea
-                id="long_description"
-                value={formData.long_description}
+                id="longDescription"
+                value={formData.longDescription}
                 onChange={(e) =>
-                  setFormData({ ...formData, long_description: e.target.value })
+                  setFormData({ ...formData, longDescription: e.target.value })
                 }
                 placeholder="Enter long description"
                 className="min-h-[200px]"
@@ -796,7 +799,7 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label>Videos</Label>
+              <Label className="mr-2">Videos</Label>
               {formData.videos?.map((video, index) => (
                 <Input
                   key={index}
@@ -858,7 +861,13 @@ export default function ContentManagement() {
           </div>
           <Dialog
             open={isCreateDialogOpen}
-            onOpenChange={setIsCreateDialogOpen}
+            onOpenChange={(open) => {
+              setIsCreateDialogOpen(open);
+              if (!open) {
+                setIsProcessing(false);
+                resetForm();
+              }
+            }}
           >
             <DialogTrigger asChild>
               <Button>
@@ -877,8 +886,13 @@ export default function ContentManagement() {
                   <Button
                     onClick={() => handleCreate(activeTab)}
                     className="w-full"
+                    disabled={isProcessing}
                   >
-                    Create {contentTypes[activeTab].title}
+                    {isProcessing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      `Create ${contentTypes[activeTab].title}`
+                    )}
                   </Button>
                 </div>
               </div>
@@ -1015,7 +1029,16 @@ export default function ContentManagement() {
         </Tabs>
 
         {/* Edit Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <Dialog
+          open={isEditDialogOpen}
+          onOpenChange={(open) => {
+            setIsEditDialogOpen(open);
+            if (!open) {
+              setIsProcessing(false);
+              resetForm();
+            }
+          }}
+        >
           <DialogContent className="max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Edit {contentTypes[activeTab].title}</DialogTitle>
@@ -1023,8 +1046,16 @@ export default function ContentManagement() {
             <div className="overflow-y-auto flex-1 px-1">
               <div className="space-y-4 mt-4">
                 {getFormFields()}
-                <Button onClick={handleUpdate} className="w-full">
-                  Update {contentTypes[activeTab].title}
+                <Button
+                  onClick={handleUpdate}
+                  className="w-full"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    `Update ${contentTypes[activeTab].title}`
+                  )}
                 </Button>
               </div>
             </div>

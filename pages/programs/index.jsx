@@ -19,7 +19,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { ArrowRight, Calendar } from "lucide-react";
-import { getAll } from "@/lib/api";
+import { getAll, getHome } from "@/lib/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
@@ -40,25 +40,37 @@ const formatDate = (isoString) => {
 
 const pageSize = 6;
 
-export async function getServerSideProps(context) {
-  const page = context.query.page ? parseInt(context.query.page) : 1;
+export async function getStaticProps() {
+  const page = 1; // Default page for static generation
   try {
-    const response = await getAll(page, pageSize, "program");
+    const homeData = await getHome(1, 10);
+
+    const response = await getAll(page, pageSize, "programs");
     const { programList, total_count } = response.data;
+    console.log(homeData);
     return {
       props: {
         programs: programList,
         totalPages: Math.ceil(total_count / pageSize),
         page,
+        homeContent: homeData.content[0] || null,
       },
+      revalidate: 3600, // Regenerate every hour (adjust as needed)
     };
   } catch (error) {
-    console.error("Error fetching programs:", error);
-    return { props: { programs: [], totalPages: 1, page: 1 } };
+    console.error("Error fetching stories:", error);
+    return {
+      props: { programs: [], totalPages: 1, page: 1, homeContent: homeData },
+    };
   }
 }
 
-export default function ProgramsPage({ programs, totalPages, page }) {
+export default function ProgramsPage({
+  programs,
+  totalPages,
+  page,
+  homeContent,
+}) {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -66,7 +78,7 @@ export default function ProgramsPage({ programs, totalPages, page }) {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-40"></div>
           <Image
-            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+            src={`${BASE_URL}${homeContent.hero_image}`}
             alt="Programs and Initiatives"
             fill
             style={{ objectFit: "cover" }}

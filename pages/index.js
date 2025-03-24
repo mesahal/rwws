@@ -50,7 +50,20 @@ export async function getStaticProps() {
     };
   }
 }
-
+// Add this utility function at the top of your file
+const getEmbedUrl = (url) => {
+  try {
+    // Handle YouTube URLs
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)?.[1];
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    }
+    // Add other video platforms here if needed
+    return url;
+  } catch {
+    return null;
+  }
+};
 export default function Home({
   homeContent,
   programs,
@@ -58,7 +71,7 @@ export default function Home({
   newsItems,
 }) {
   const [loading, setLoading] = useState(true);
-  console.log(newsItems);
+  console.log(homeContent);
 
   // The loading state only checks homeContent, but other content might be missing
   useEffect(() => {
@@ -285,6 +298,57 @@ export default function Home({
               <Link href="/programs">View All Programs</Link>
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Video Gallery */}
+      <section className="py-16 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Latest Videos</h2>
+            <p className="text-lg max-w-3xl mx-auto">
+              Watch our latest videos to see our work in action.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {homeContent.videos?.map((video) => (
+              <Card key={video.id}>
+                <div className="relative aspect-video">
+                  <iframe
+                    src={getEmbedUrl(video)}
+                    title={video.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full rounded-t-lg"
+                  />
+                </div>
+                <CardHeader>
+                  <CardTitle>{video.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="line-clamp-2">
+                    {video.description}
+                  </CardDescription>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild variant="ghost" className="w-full">
+                    <a
+                      href={video.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Watch on YouTube <ArrowRight className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+          {/* <div className="text-center mt-10">
+            <Button asChild variant="outline">
+              <Link href="/videos">View All Videos</Link>
+            </Button>
+          </div> */}
         </div>
       </section>
 
