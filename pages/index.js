@@ -19,92 +19,25 @@ import {
   Calendar,
   Newspaper,
 } from "lucide-react";
-import { getHome } from "@/lib/api";
+import { getHome, getAll } from "@/lib/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
-
-// Mock data (would come from API in production)
-const impactStories = [
-  {
-    id: 1,
-    title: "Clean Water for Rural Village",
-    excerpt:
-      "How our water project transformed the lives of 500 families in a remote village.",
-    image:
-      "https://images.unsplash.com/photo-1541252260730-0412e8e2108e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Water & Sanitation",
-  },
-  {
-    id: 2,
-    title: "Education for All Initiative",
-    excerpt:
-      "Providing quality education to 1,000 underprivileged children in urban areas.",
-    image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Education",
-  },
-  {
-    id: 3,
-    title: "Healthcare Outreach Program",
-    excerpt:
-      "Mobile clinics bringing essential healthcare to remote communities.",
-    image:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    category: "Healthcare",
-  },
-];
-
-const newsItems = [
-  {
-    id: 1,
-    title: "Annual Fundraising Gala Raises $2 Million",
-    date: "June 15, 2025",
-    excerpt:
-      "Our annual gala exceeded expectations with record-breaking donations.",
-  },
-  {
-    id: 2,
-    title: "New Partnership with Global Health Initiative",
-    date: "May 28, 2025",
-    excerpt:
-      "Strategic partnership will expand our healthcare programs to 5 new countries.",
-  },
-  {
-    id: 3,
-    title: "RWWS Receives Humanitarian Award",
-    date: "April 10, 2025",
-    excerpt:
-      "Recognized for outstanding contributions to community development.",
-  },
-];
-
-const programs = [
-  {
-    id: 1,
-    title: "Clean Water Initiative",
-    description: "Providing clean water solutions to communities in need.",
-    icon: <Globe className="h-10 w-10 text-chart-1" />,
-  },
-  {
-    id: 2,
-    title: "Education for All",
-    description: "Ensuring quality education for underprivileged children.",
-    icon: <BookOpen className="h-10 w-10 text-chart-2" />,
-  },
-  {
-    id: 3,
-    title: "Community Healthcare",
-    description: "Bringing essential healthcare services to remote areas.",
-    icon: <Users className="h-10 w-10 text-chart-3" />,
-  },
-];
-
+// Add this at the top of getStaticProps
+const page = 1;
+const pageSize = 3; // Or whatever number you want per section
 export async function getStaticProps() {
   try {
     const homeData = await getHome(1, 10);
+    const storyContent = await getAll(page, pageSize, "story");
+    const programContent = await getAll(page, pageSize, "program");
+    const newsContent = await getAll(page, pageSize, "news");
+
     return {
       props: {
         homeContent: homeData.content[0] || null,
+        programs: programContent.data.programList,
+        impactStories: storyContent.data.storyList,
+        newsItems: newsContent.data.newsList,
       },
       revalidate: 3600, // ISR revalidation
     };
@@ -118,13 +51,21 @@ export async function getStaticProps() {
   }
 }
 
-export default function Home({ homeContent }) {
+export default function Home({
+  homeContent,
+  programs,
+  impactStories,
+  newsItems,
+}) {
   const [loading, setLoading] = useState(true);
-  console.log(homeContent);
+  console.log(newsItems);
 
+  // The loading state only checks homeContent, but other content might be missing
   useEffect(() => {
-    if (homeContent) setLoading(false);
-  }, [homeContent]);
+    if (homeContent && programs && impactStories && newsItems) {
+      setLoading(false);
+    }
+  }, [homeContent, programs, impactStories, newsItems]);
 
   if (loading) {
     return (
@@ -221,14 +162,14 @@ export default function Home({ homeContent }) {
               <Card key={story.id} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
-                    src={story.image}
+                    src={`${BASE_URL}${story.image}`}
                     alt={story.title}
                     fill
                     style={{ objectFit: "cover" }}
                   />
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                  {/* <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                     {story.category}
-                  </div>
+                  </div> */}
                 </div>
                 <CardHeader>
                   <CardTitle>{story.title}</CardTitle>
@@ -268,6 +209,14 @@ export default function Home({ homeContent }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {newsItems.map((item) => (
               <Card key={item.id}>
+                <div className="relative h-48">
+                  <Image
+                    src={`${BASE_URL}${item.image}`}
+                    alt={item.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
                 <CardHeader>
                   <div className="flex items-center text-muted-foreground mb-2">
                     <Newspaper className="h-4 w-4 mr-2" />
@@ -275,7 +224,7 @@ export default function Home({ homeContent }) {
                   </div>
                   <CardTitle>{item.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="text-muted-foreground mb-6 line-clamp-2">
                   <CardDescription>{item.excerpt}</CardDescription>
                 </CardContent>
                 <CardFooter>
@@ -306,6 +255,14 @@ export default function Home({ homeContent }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {programs.map((program) => (
               <Card key={program.id} className="text-center">
+                <div className="relative h-48">
+                  <Image
+                    src={`${BASE_URL}${program.image}`}
+                    alt={program.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
                 <CardHeader>
                   <div className="mx-auto mb-4">{program.icon}</div>
                   <CardTitle>{program.title}</CardTitle>

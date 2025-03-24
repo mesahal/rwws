@@ -36,6 +36,7 @@ import {
   Eye,
   Loader2,
   Heart,
+  Home,
 } from "lucide-react";
 import AdminLayout from "../layout";
 import { title } from "process";
@@ -60,6 +61,7 @@ import { title } from "process";
 //   status: string
 //   image: File | null
 // }
+
 const formatDate = (isoString) => {
   const date = new Date(isoString);
   return date.toLocaleDateString("en-US", {
@@ -68,6 +70,7 @@ const formatDate = (isoString) => {
     day: "numeric",
   });
 };
+
 export default function ContentManagement() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,7 +80,7 @@ export default function ContentManagement() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("news");
+  const [activeTab, setActiveTab] = useState("home");
   const [contentItems, setContentItems] = useState([]);
 
   const pageSize = 6;
@@ -121,6 +124,10 @@ export default function ContentManagement() {
       title: "Impact Stories",
       icon: <Heart className="h-4 w-4 mr-2" />,
     },
+    home: {
+      title: "Home Content",
+      icon: <Home className="h-4 w-4 mr-2" />,
+    },
   };
 
   useEffect(() => {
@@ -137,6 +144,7 @@ export default function ContentManagement() {
       if (activeTab == "news") setContentItems(data.newsList);
       else if (activeTab == "story") setContentItems(data.storyList);
       else if (activeTab == "program") setContentItems(data.programList);
+      else if (activeTab == "home") setContentItems(data.content);
       setTotalPages(Math.ceil(data.total_count / pageSize));
     } catch (error) {
       toast({
@@ -157,13 +165,16 @@ export default function ContentManagement() {
 
   const constructFormData = () => {
     const formDataToSend = new FormData();
-    const baseData = {
-      title: formData.title,
-      category_id: formData.category,
-    };
-
+    let baseData = {};
     let typeSpecificData = {};
 
+    // Include baseData only if it's NOT "home"
+    if (activeTab !== "home") {
+      baseData = {
+        title: formData.title,
+        category_id: formData.category,
+      };
+    }
     switch (activeTab) {
       case "news":
         typeSpecificData = {
@@ -195,6 +206,23 @@ export default function ContentManagement() {
           start_date: formData.start_date,
         };
         break;
+      case "home":
+        typeSpecificData = {
+          hero_headline: formData.hero_headline,
+          cta_text: formData.cta_text,
+          mission: formData.mission,
+          vision: formData.vision,
+          video_urls: formData.videos,
+        };
+        if (formData.hero_image) {
+          formDataToSend.append("hero_image", formData.hero_image);
+        }
+        if (formData.images) {
+          formData.images.forEach((image, index) => {
+            formDataToSend.append(`images`, image);
+          });
+        }
+        break;
     }
 
     if (formData.image) {
@@ -208,7 +236,6 @@ export default function ContentManagement() {
         ...typeSpecificData,
       })
     );
-
     return formDataToSend;
   };
 
@@ -226,6 +253,15 @@ export default function ContentManagement() {
         "locations",
         "status",
         "start_date",
+      ],
+      home: [
+        "hero_headline",
+        "cta_text",
+        "mission",
+        "vision",
+        "hero_image",
+        "images",
+        "videos",
       ],
     };
 
@@ -245,7 +281,9 @@ export default function ContentManagement() {
   };
 
   const handleCreate = async (activeTab) => {
-    formData.category = categoryMap[activeTab] || null;
+    if (activeTab != "home") {
+      formData.category = categoryMap[activeTab] || null;
+    }
     console.log(formData);
     if (!validateForm()) return;
 
@@ -685,6 +723,105 @@ export default function ContentManagement() {
           </>
         );
 
+      case "home":
+        return (
+          <>
+            <div>
+              <Label htmlFor="hero_headline">Hero Headline</Label>
+              <Input
+                id="hero_headline"
+                value={formData.hero_headline}
+                onChange={(e) =>
+                  setFormData({ ...formData, hero_headline: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="cta_text">Hero Text</Label>
+              <Textarea
+                id="cta_text"
+                value={formData.cta_text}
+                onChange={(e) =>
+                  setFormData({ ...formData, cta_text: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="mission">Mission Statement</Label>
+              <Textarea
+                id="mission"
+                value={formData.mission}
+                onChange={(e) =>
+                  setFormData({ ...formData, mission: e.target.value })
+                }
+                className="min-h-[100px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="vision">Vision Statement</Label>
+              <Textarea
+                id="vision"
+                value={formData.vision}
+                onChange={(e) =>
+                  setFormData({ ...formData, vision: e.target.value })
+                }
+                className="min-h-[100px]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="hero_image">Hero Image</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    hero_image: e.target.files?.[0],
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label>Mission Vission Images</Label>
+              <Input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    images: Array.from(e.target.files),
+                  })
+                }
+              />
+            </div>
+            <div>
+              <Label>Videos</Label>
+              {formData.videos?.map((video, index) => (
+                <Input
+                  key={index}
+                  value={video}
+                  className="mb-2"
+                  onChange={(e) => {
+                    const newVideos = [...formData.videos];
+                    newVideos[index] = e.target.value;
+                    setFormData({ ...formData, videos: newVideos });
+                  }}
+                />
+              ))}
+              <Button
+                onClick={() =>
+                  setFormData({
+                    ...formData,
+                    videos: [...(formData.videos || []), ""],
+                  })
+                }
+              >
+                Add Video URL
+              </Button>
+            </div>
+          </>
+        );
       default:
         return null;
     }
@@ -755,17 +892,20 @@ export default function ContentManagement() {
           onValueChange={setActiveTab}
         >
           <TabsList>
-            <TabsTrigger value="news">
-              <Newspaper className="h-4 w-4 mr-2" /> News
+            <TabsTrigger value="home" className="text-2xl">
+              <Home className="h-5 w-5 mr-2" /> Home
+            </TabsTrigger>
+            <TabsTrigger value="news" className="text-2xl">
+              <Newspaper className="h-5 w-5 mr-2" /> News
             </TabsTrigger>
             {/* <TabsTrigger value="blogs">
               <FileText className="h-4 w-4 mr-2" /> Blogs
             </TabsTrigger> */}
-            <TabsTrigger value="program">
-              <BookOpen className="h-4 w-4 mr-2" /> Programs
+            <TabsTrigger value="program" className="text-2xl">
+              <BookOpen className="h-5 w-5 mr-2" /> Programs
             </TabsTrigger>
-            <TabsTrigger value="story">
-              <Heart className="h-4 w-4 mr-2" /> Impact Stories
+            <TabsTrigger value="story" className="text-2xl">
+              <Heart className="h-5 w-5 mr-2" /> Impact Stories
             </TabsTrigger>
             {/* <TabsTrigger value="reports">
               <FileSpreadsheet className="h-4 w-4 mr-2" /> Reports
@@ -793,6 +933,14 @@ export default function ContentManagement() {
                       <tbody>
                         {contentItems.map((item) => (
                           <tr key={item.id} className="border-b">
+                            {activeTab == "home" ? (
+                              <td className="py-3 px-4">
+                                {item.hero_headline}
+                              </td>
+                            ) : (
+                              <td className="py-3 px-4">{item.title}</td>
+                            )}
+                            {/* <td className="py-3 px-4">{item.category}</td>
                             <td className="py-3 px-4">{item.title}</td>
                             {/* <td className="py-3 px-4">{item.category}</td>
                             <td className="py-3 px-4">
@@ -813,13 +961,13 @@ export default function ContentManagement() {
                             </td>
                             <td className="py-3 px-4">
                               <div className="flex justify-end space-x-2">
-                                <Button
+                                {/* <Button
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleView(item)}
                                 >
                                   <Eye className="h-4 w-4" />
-                                </Button>
+                                </Button> */}
                                 <Button
                                   variant="ghost"
                                   size="icon"
