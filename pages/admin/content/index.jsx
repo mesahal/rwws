@@ -401,14 +401,14 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="excerpt">Excerpt</Label>
+              <Label htmlFor="excerpt">Content</Label>
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
                 onChange={(e) =>
                   setFormData({ ...formData, excerpt: e.target.value })
                 }
-                placeholder="Enter excerpt"
+                placeholder="Enter content"
               />
             </div>
             {/* <div>
@@ -466,14 +466,14 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="excerpt">Excerpt</Label>
+              <Label htmlFor="excerpt">Short Descrption</Label>
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
                 onChange={(e) =>
                   setFormData({ ...formData, excerpt: e.target.value })
                 }
-                placeholder="Enter excerpt"
+                placeholder="Enter short description"
               />
             </div>
             <div>
@@ -565,14 +565,14 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Short Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Enter description"
+                placeholder="Enter short description"
               />
             </div>
             <div>
@@ -618,7 +618,7 @@ export default function ContentManagement() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    goals: e.target.value.split("\n").filter(Boolean),
+                    goals: e.target.value.split("\n"),
                   })
                 }
                 placeholder="Enter goals (one per line)"
@@ -632,7 +632,7 @@ export default function ContentManagement() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    achievements: e.target.value.split("\n").filter(Boolean),
+                    achievements: e.target.value.split("\n"),
                   })
                 }
                 placeholder="Enter achievements (one per line)"
@@ -646,7 +646,7 @@ export default function ContentManagement() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    locations: e.target.value.split("\n").filter(Boolean),
+                    locations: e.target.value.split("\n"),
                   })
                 }
                 placeholder="Enter locations (one per line)"
