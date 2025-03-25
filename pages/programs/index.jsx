@@ -40,27 +40,36 @@ const formatDate = (isoString) => {
 
 const pageSize = 6;
 
-export async function getStaticProps() {
-  const page = 1; // Default page for static generation
+export async function getServerSideProps(context) {
   try {
+    // Get page number from query parameters, default to 1
+    const page = parseInt(context.query.page) || 1;
+    const validPage = Math.max(1, page);
+
+    // Fetch home data
     const homeData = await getHome(1, 10);
 
-    const response = await getAll(page, pageSize, "programs");
+    // Fetch programs data with pagination
+    const response = await getAll(validPage, pageSize, "program");
     const { programList, total_count } = response.data;
-    console.log(homeData);
+
     return {
       props: {
-        programs: programList,
-        totalPages: Math.ceil(total_count / pageSize),
-        page,
-        homeContent: homeData.content[0] || null,
+        programs: programList || [],
+        totalPages: Math.ceil(total_count / pageSize) || 1,
+        page: validPage,
+        homeContent: homeData?.content?.[0] || null,
       },
-      revalidate: 3600, // Regenerate every hour (adjust as needed)
     };
   } catch (error) {
-    console.error("Error fetching stories:", error);
+    console.error("Error fetching data:", error);
     return {
-      props: { programs: [], totalPages: 1, page: 1, homeContent: homeData },
+      props: {
+        programs: [],
+        totalPages: 1,
+        page: 1,
+        homeContent: null,
+      },
     };
   }
 }

@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { newsService } from "@/lib/news";
 import { getAll, create, update, remove } from "../../../lib/api";
 import {
   FileText,
@@ -40,27 +39,6 @@ import {
 } from "lucide-react";
 import AdminLayout from "../layout";
 import { title } from "process";
-// Content type interfaces
-// interface ContentItem {
-//   id: string
-//   title: string
-//   excerpt: string
-//   content: string
-//   image?: File | null
-//   category: string
-//   status: string
-//   date: string
-//   author: string
-// }
-
-// interface ContentFormData {
-//   title: string
-//   excerpt: string
-//   content: string
-//   category: string
-//   status: string
-//   image: File | null
-// }
 
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -99,26 +77,11 @@ export default function ContentManagement() {
       title: "News Articles",
       icon: <Newspaper className="h-4 w-4 mr-2" />,
     },
-    // blogs: {
-    //   categories: ["Impact Stories", "Field Reports", "Opinion", "Analysis"],
-    //   title: "Blog Posts",
-    //   icon: <FileText className="h-4 w-4 mr-2" />,
-    // },
     program: {
       categories: ["1", "2", "3"],
       title: "Programs",
       icon: <BookOpen className="h-4 w-4 mr-2" />,
     },
-    // reports: {
-    //   categories: [
-    //     "Annual Report",
-    //     "Financial Report",
-    //     "Impact Report",
-    //     "Project Report",
-    //   ],
-    //   title: "Reports",
-    //   icon: <FileSpreadsheet className="h-4 w-4 mr-2" />,
-    // },
     story: {
       categories: ["1", "2", "3"],
       title: "Impact Stories",
@@ -138,7 +101,6 @@ export default function ContentManagement() {
     setLoading(true);
     try {
       const response = await getAll(currentPage, pageSize, activeTab);
-      // const data = await response.json();
       const data = response.data;
       console.log(data);
       if (activeTab == "news") setContentItems(data.newsList);
@@ -302,6 +264,11 @@ export default function ContentManagement() {
         setIsCreateDialogOpen(false);
         resetForm();
       } else {
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        });
         throw new Error(data.message);
       }
     } catch (error) {
@@ -311,6 +278,8 @@ export default function ContentManagement() {
           error instanceof Error ? error.message : "Failed to create content",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false); // Ensures it stops processing in both success & error cases
     }
   };
 
@@ -348,6 +317,11 @@ export default function ContentManagement() {
         setIsEditDialogOpen(false);
         resetForm();
       } else {
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        });
         throw new Error(data.message);
       }
     } catch (error) {
@@ -357,6 +331,8 @@ export default function ContentManagement() {
           error instanceof Error ? error.message : "Failed to update content",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false); // Ensures it stops processing in both success & error cases
     }
   };
 
@@ -377,6 +353,11 @@ export default function ContentManagement() {
         });
         fetchContent();
       } else {
+        toast({
+          title: "Error",
+          description: data.message,
+          variant: "destructive",
+        });
         throw new Error(data.message);
       }
     } catch (error) {
@@ -386,6 +367,8 @@ export default function ContentManagement() {
           error instanceof Error ? error.message : "Failed to delete content",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false); // Ensures it stops processing in both success & error cases
     }
   };
 

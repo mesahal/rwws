@@ -19,16 +19,7 @@ import {
   PaginationPrevious,
 } from "../../components/ui/pagination";
 import { ArrowRight, Calendar, Filter, Search } from "lucide-react";
-import { Input } from "../../components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
 import { getAll, getHome } from "../../lib/api";
-import { newsService } from "../../lib/news";
 
 export const metadata = {
   title: "News & Updates - RWWS",
@@ -46,39 +37,10 @@ const formatDate = (isoString) => {
   });
 };
 
-const categories = [
-  "All Categories",
-  "Events",
-  "Partnerships",
-  "Awards",
-  "Programs",
-  "Reports",
-  "Emergency Relief",
-  "Healthcare",
-];
-const years = ["All Years", "2025", "2024", "2023", "2022"];
 const pageSize = 6;
-// ✅ Fetch news on each request (SSR)
-// export async function getServerSideProps(context) {
-//   const page = context.query.page ? parseInt(context.query.page) : 1;
-//   try {
-//     // const response = await newsService.getAll(page, 10);
-//     const response = await getAll(page, pageSize, "news");
-//     const { newsList, total_count } = response.data; // ✅ Correct Destructuring
-//     return {
-//       props: {
-//         newsItems: newsList,
-//         totalPages: Math.ceil(total_count / pageSize),
-//         page,
-//       },
-//     };
-//   } catch (error) {
-//     console.error("Error fetching news:", error);
-//     return { props: { newsItems: [], totalPages: 1, page: 1 } };
-//   }
-// }
+
 export async function getStaticProps() {
-  const page = 1; // Default page for static generation
+  const page = 1;
   try {
     const homeData = await getHome(1, 10);
 
@@ -92,10 +54,10 @@ export async function getStaticProps() {
         page,
         homeContent: homeData.content[0] || null,
       },
-      revalidate: 3600, // Regenerate every hour (adjust as needed)
+      revalidate: 3600,
     };
   } catch (error) {
-    console.error("Error fetching stories:", error);
+    console.error("Error fetching news:", error);
     return {
       props: { newsItems: [], totalPages: 1, page: 1, homeContent: homeData },
     };
@@ -103,11 +65,6 @@ export async function getStaticProps() {
 }
 
 export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
-  // const page = searchParams?.page ? parseInt(searchParams.page) : 1;
-  // const { items: newsItems, totalPages } = await fetchNews(page);
-  // const itemsPerPage = 6;
-  // const totalPages = Math.ceil(newsItems.length / itemsPerPage);
-
   const currentItems = newsItems;
 
   return (
