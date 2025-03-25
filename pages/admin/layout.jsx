@@ -12,17 +12,36 @@ import {
   LogOut,
   Menu,
   X,
+  Key,
 } from "lucide-react";
+import { auth } from "@/lib/auth"; // Import your auth service
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
 
 const AdminLayout = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = () => {
-      const isAdmin = localStorage.getItem("isAdmin");
-      if (!isAdmin && router.pathname !== "/admin/login") {
+    const checkAuth = async () => {
+      const accessToken = auth.getAccessToken();
+      if (!accessToken && router.pathname !== "/admin/login") {
         router.push("/admin/login");
       } else {
         setIsAuthenticated(true);
@@ -32,11 +51,55 @@ const AdminLayout = ({ children }) => {
     checkAuth();
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAdmin");
-    document.cookie =
-      "isAdmin=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  const handleLogout = async () => {
+    await auth.logout();
     router.push("/admin/login");
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords don't match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await auth.changePassword(
+        passwordData.oldPassword,
+        passwordData.newPassword
+      );
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Password changed successfully",
+        });
+        setIsChangePasswordOpen(false);
+        setPasswordData({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to change password",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const navItems = [
@@ -50,32 +113,14 @@ const AdminLayout = ({ children }) => {
       label: "Content",
       icon: <FileText className="h-5 w-5" />,
     },
-    // {
-    //   href: "/admin/users",
-    //   label: "Users",
-    //   icon: <Users className="h-5 w-5" />,
-    // },
-    // {
-    //   href: "/admin/aid-requests",
-    //   label: "Aid Requests",
-    //   icon: <HandHelping className="h-5 w-5" />,
-    // },
-    // {
-    //   href: "/admin/seo",
-    //   label: "SEO & Analytics",
-    //   icon: <Search className="h-5 w-5" />,
-    // },
-    // {
-    //   href: "/admin/security",
-    //   label: "Security",
-    //   icon: <Shield className="h-5 w-5" />,
-    // },
+    // ... other nav items
   ];
 
   if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Mobile menu button (unchanged) */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
           variant="outline"
@@ -112,6 +157,77 @@ const AdminLayout = ({ children }) => {
                 <span className="ml-3">{item.label}</span>
               </Link>
             ))}
+
+            {/* Change Password Button */}
+            <Dialog
+              open={isChangePasswordOpen}
+              onOpenChange={setIsChangePasswordOpen}
+            >
+              <DialogTrigger asChild>
+                <button className="w-full flex items-center px-3 py-2 text-sm rounded-md hover:bg-accent hover:text-accent-foreground">
+                  <Key className="h-5 w-5" />
+                  <span className="ml-3">Change Password</span>
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Change Password</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="oldPassword">Current Password</Label>
+                    <Input
+                      id="oldPassword"
+                      type="password"
+                      value={passwordData.oldPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          oldPassword: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          newPassword: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <Button
+                    onClick={handleChangePassword}
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    {isLoading ? "Changing..." : "Change Password"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </nav>
 
           <Button

@@ -169,7 +169,7 @@ export const auth = {
       deleteCookie("refreshToken");
       deleteCookie("tokenExpiry");
 
-      window.location.href = "/login";
+      window.location.href = "admin/login";
     }
   },
 
