@@ -13,13 +13,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Shield } from "lucide-react";
+import { Shield, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -112,14 +113,25 @@ export default function AdminLogin() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"} // Dynamically update the type
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    className="absolute inset-y-0 right-2 flex items-center p-2"
+                    onClick={() => setShowPassword(!showPassword)}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </Button>
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>

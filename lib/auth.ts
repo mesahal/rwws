@@ -14,6 +14,30 @@ export interface Tokens {
   refresh: string;
 }
 
+// Cookie helper functions
+const setCookie = (name: string, value: string, days = 1) => {
+  if (typeof document !== "undefined") {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+  }
+};
+
+const getCookie = (name: string): string | null => {
+  if (typeof document !== "undefined") {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  }
+  return null;
+};
+
+const deleteCookie = (name: string) => {
+  if (typeof document !== "undefined") {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  }
+};
+
 export const auth = {
   async signUp(email: string, username: string): Promise<AuthResponse> {
     try {
@@ -48,10 +72,12 @@ export const auth = {
         // Store tokens
         localStorage.setItem("accessToken", data.data.access);
         localStorage.setItem("refreshToken", data.data.refresh);
-
+        setCookie("accessToken", data.data.access);
+        setCookie("refreshToken", data.data.refresh);
         // Set token expiry time (access token expires in 1 hour)
         const expiryTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour
         localStorage.setItem("tokenExpiry", expiryTime.toString());
+        setCookie("tokenExpiry", expiryTime.toString());
       }
       return data;
     } catch (error) {
@@ -65,7 +91,9 @@ export const auth = {
 
   async refreshToken(): Promise<boolean> {
     try {
-      const refreshToken = localStorage.getItem("refreshToken");
+      // Try cookies first, fall back to localStorage
+      const refreshToken =
+        getCookie("refreshToken") || localStorage.getItem("refreshToken");
       if (!refreshToken) {
         this.logout();
         return false;
@@ -81,9 +109,14 @@ export const auth = {
 
       const data = await response.json();
       if (data.success) {
+        // Update both storage methods
         localStorage.setItem("accessToken", data.data.access);
-        const expiryTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour
+        setCookie("accessToken", data.data.access);
+
+        const expiryTime = new Date().getTime() + 60 * 60 * 1000;
         localStorage.setItem("tokenExpiry", expiryTime.toString());
+        setCookie("tokenExpiry", expiryTime.toString());
+
         return true;
       }
 
@@ -114,7 +147,8 @@ export const auth = {
 
   async logout(): Promise<void> {
     try {
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken =
+        getCookie("accessToken") || localStorage.getItem("accessToken");
       if (accessToken) {
         await fetch(`${API_BASE_URL}/logout`, {
           method: "POST",
@@ -126,9 +160,15 @@ export const auth = {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
+      // Clear both storage methods
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("tokenExpiry");
+
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      deleteCookie("tokenExpiry");
+
       window.location.href = "/login";
     }
   },
@@ -205,6 +245,7 @@ export const auth = {
   },
 
   getAccessToken(): string | null {
-    return localStorage.getItem("accessToken");
+    // Try cookies first, fall back to localStorage
+    return getCookie("accessToken") || localStorage.getItem("accessToken");
   },
 };

@@ -8,11 +8,8 @@ export function middleware(request) {
       return NextResponse.next();
     }
 
-    // Check for admin authentication
-    const isAdmin = request.cookies.get("isAdmin");
-
-    if (!isAdmin) {
-      // Redirect to login if not authenticated
+    const accessToken = request.cookies.get("accessToken")?.value;
+    if (!accessToken) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
