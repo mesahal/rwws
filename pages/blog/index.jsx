@@ -278,7 +278,7 @@ export default function BlogPage({ searchParams }) {
                   <div className="p-6 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center text-muted-foreground mb-2">
-                        <Calendar className="h-4 w-4 mr-2" />
+                        {/* <Calendar className="h-4 w-4 mr-2" /> */}
                         <span className="text-sm">{blogPosts[0].date}</span>
                         <span className="mx-2">•</span>
                         <User className="h-4 w-4 mr-2" />
@@ -320,7 +320,7 @@ export default function BlogPage({ searchParams }) {
                 </div>
                 <CardHeader>
                   <div className="flex items-center text-muted-foreground mb-2">
-                    <Calendar className="h-4 w-4 mr-2" />
+                    {/* <Calendar className="h-4 w-4 mr-2" /> */}
                     <span className="text-sm">{post.date}</span>
                   </div>
                   <CardTitle>{post.title}</CardTitle>

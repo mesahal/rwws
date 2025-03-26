@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Calendar } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -19,11 +20,11 @@ import {
 import { FileText, Download, ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export const metadata = {
-  title: "Financial Reports - RWWS",
-  description:
-    "Access our audited financial statements and annual reports for complete transparency",
-};
+// export const metadata = {
+//   title: "Financial Reports - RWWS",
+//   description:
+//     "Access our audited financial statements and annual reports for complete transparency",
+// };
 
 // Mock data (would come from API in production)
 const financialReports = [

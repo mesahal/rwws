@@ -28,7 +28,7 @@ const financialReports = [
     content: `
       <h2>Executive Summary</h2>
       <p>The year 2024 marked significant growth and impact for RWWS. Through the generous support of our donors and the dedication of our team, we expanded our reach to serve more communities in need while maintaining high standards of efficiency and transparency.</p>
-      
+
       <h2>Financial Highlights</h2>
       <ul>
         <li>Total Revenue: $12,000,000 (35% increase from 2023)</li>

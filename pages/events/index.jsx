@@ -17,11 +17,11 @@ import {
 } from "../../components/ui/tabs";
 import { Calendar, Clock, MapPin, Users, ArrowRight } from "lucide-react";
 
-export const metadata = {
-  title: "Events Calendar - RWWS",
-  description:
-    "Upcoming events, fundraisers, volunteer opportunities, and more",
-};
+// export const metadata = {
+//   title: "Events Calendar - RWWS",
+//   description:
+//     "Upcoming events, fundraisers, volunteer opportunities, and more",
+// };
 
 // Mock data (would come from API in production)
 const events = [
@@ -218,7 +218,7 @@ export default function EventsPage({ searchParams }) {
                       asChild
                     >
                       <Link href={`/events?month=${encodeURIComponent(month)}`}>
-                        <Calendar className="h-4 w-4 mr-2" />
+                        {/* <Calendar className="h-4 w-4 mr-2" /> */}
                         {month}
                       </Link>
                     </Button>
