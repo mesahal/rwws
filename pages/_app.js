@@ -7,6 +7,11 @@ import { Toaster } from "../components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Disable WebSockets in production
+if (typeof window !== "undefined" && process.env.NODE_ENV === "production") {
+  window.__NEXT_DEV_HMR__ = false;
+}
+
 export default function MyApp({ Component, pageProps }) {
   return (
     <div className={inter.className}>
