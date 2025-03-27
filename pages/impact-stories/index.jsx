@@ -65,7 +65,6 @@ export async function getStaticProps() {
 
     const response = await getAll(page, pageSize, "story");
     const { storyList, total_count } = response.data;
-    console.log(homeData);
     return {
       props: {
         storyItems: storyList,

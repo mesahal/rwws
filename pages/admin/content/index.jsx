@@ -102,7 +102,6 @@ export default function ContentManagement() {
     try {
       const response = await getAll(currentPage, pageSize, activeTab);
       const data = response.data;
-      console.log(data);
       if (activeTab == "news") setContentItems(data.newsList);
       else if (activeTab == "story") setContentItems(data.storyList);
       else if (activeTab == "program") setContentItems(data.programList);
@@ -246,7 +245,6 @@ export default function ContentManagement() {
     if (activeTab !== "home") {
       formData.category = categoryMap[activeTab] || null;
     }
-    console.log(formData);
     if (!validateForm()) return;
     setIsProcessing(true); // Start loading
 
@@ -254,7 +252,6 @@ export default function ContentManagement() {
       const formDataToSend = constructFormData();
       const response = await create(formDataToSend, activeTab);
       const data = response;
-      console.log(data);
       if (data.success) {
         toast({
           title: "Success",

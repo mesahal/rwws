@@ -16,8 +16,33 @@ const nextConfig = {
     };
     return config;
   },
+  // Add trailing slashes to URLs
+  trailingSlash: true,
+  // Enable static compression
+  compress: true,
+  // Increase build cache
   experimental: {
     appDir: false, // If using the old pages router
+    turbotrace: {
+      logLevel: "error",
+    },
+  },
+  // Handle 404 errors
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        destination: "/404",
+        permanent: false,
+        has: [
+          {
+            type: "header",
+            key: "x-not-found",
+            value: "true",
+          },
+        ],
+      },
+    ];
   },
 };
 

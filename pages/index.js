@@ -71,7 +71,6 @@ export default function Home({
   newsItems,
 }) {
   const [loading, setLoading] = useState(true);
-  console.log(homeContent);
 
   // The loading state only checks homeContent, but other content might be missing
   useEffect(() => {
