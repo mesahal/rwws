@@ -80,6 +80,9 @@ export default function ProgramsPage({
   page,
   homeContent,
 }) {
+  if (!homeContent) {
+    return <div className="text-center py-8">Failed to load content</div>;
+  }
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}

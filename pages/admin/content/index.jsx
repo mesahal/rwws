@@ -170,7 +170,7 @@ export default function ContentManagement() {
       case "home":
         typeSpecificData = {
           hero_headline: formData.hero_headline,
-          cta_text: formData.cta_text,
+          hero_text: formData.hero_text,
           mission: formData.mission,
           vision: formData.vision,
           video_urls: formData.videos,
@@ -217,7 +217,7 @@ export default function ContentManagement() {
       ],
       home: [
         "hero_headline",
-        "cta_text",
+        "hero_text",
         "mission",
         "vision",
         "hero_image",
@@ -720,12 +720,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="cta_text">Hero Text</Label>
+              <Label htmlFor="hero_text">Hero Text</Label>
               <Textarea
-                id="cta_text"
-                value={formData.cta_text}
+                id="hero_text"
+                value={formData.hero_text}
                 onChange={(e) =>
-                  setFormData({ ...formData, cta_text: e.target.value })
+                  setFormData({ ...formData, hero_text: e.target.value })
                 }
               />
             </div>

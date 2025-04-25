@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 
+// middleware.js
 export function middleware(request) {
-  // Check if the request is for an admin page
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    // Skip the login page from protection
-    if (request.nextUrl.pathname === "/admin/login") {
+  const pathname = request.nextUrl.pathname.replace(/\/$/, ""); // Remove trailing slash
+
+  if (pathname.startsWith("/admin")) {
+    if (pathname === "/admin/login") {
       return NextResponse.next();
     }
 
@@ -16,7 +17,3 @@ export function middleware(request) {
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: "/admin/:path*",
-};

@@ -7,7 +7,7 @@ const nextConfig = {
       "images.unsplash.com", // Allow Unsplash images
       "localhost", // Local development
       "rwws.vercel.app",
-      "demo.rwws.org.bd",
+      "api.rwws.org.bd",
     ], // Production deployment
   },
   webpackDevMiddleware: (config) => {

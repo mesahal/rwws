@@ -70,22 +70,13 @@ export default function Home({
   impactStories,
   newsItems,
 }) {
-  const [loading, setLoading] = useState(true);
-
-  // The loading state only checks homeContent, but other content might be missing
-  useEffect(() => {
-    if (homeContent && programs && impactStories && newsItems) {
-      setLoading(false);
-    }
-  }, [homeContent, programs, impactStories, newsItems]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  //     </div>
+  //   );
+  // }
 
   if (!homeContent) {
     return <div className="text-center py-8">Failed to load content</div>;
@@ -97,15 +88,14 @@ export default function Home({
       <section className="relative bg-gradient-to-r from-primary to-chart-3 text-white py-20 md:py-32">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-30"></div>
-          {homeContent.hero_image && (
-            <Image
-              src={`${BASE_URL}${homeContent.hero_image}`}
-              alt={homeContent.hero_headline}
-              fill
-              style={{ objectFit: "cover" }}
-              priority
-            />
-          )}
+
+          <Image
+            src={`${BASE_URL}${homeContent.hero_image}`}
+            alt={homeContent.hero_headline}
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+          />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
