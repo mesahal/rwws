@@ -24,24 +24,6 @@ import { getAll, getHome } from "../../lib/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
-const categories = [
-  "All",
-  "Water & Sanitation",
-  "Education",
-  "Healthcare",
-  "Agriculture",
-  "Economic Development",
-  "Emergency Relief",
-];
-const locations = [
-  "All",
-  "East Africa",
-  "West Africa",
-  "South Asia",
-  "Southeast Asia",
-  "Latin America",
-];
-
 const formatDate = (isoString) => {
   const date = new Date(isoString);
   return date.toLocaleDateString("en-US", {
@@ -59,23 +41,31 @@ export const metadata = {
 const pageSize = 6;
 
 export async function getStaticProps() {
-  const page = 1; // Default page for static generation
+  const page = 1;
   try {
     const homeData = await getHome(1, 10);
-
     const response = await getAll(page, pageSize, "story");
     const { storyList, total_count } = response.data;
+
+    // Add slug generation
+    const storiesWithSlugs = storyList.map((item) => ({
+      ...item,
+      slug: item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, ""),
+    }));
+
     return {
       props: {
-        storyItems: storyList,
+        storyItems: storiesWithSlugs,
         totalPages: Math.ceil(total_count / pageSize),
         page,
         homeContent: homeData.content[0] || null,
       },
-      revalidate: 3600, // Regenerate every hour (adjust as needed)
+      revalidate: 3600,
     };
   } catch (error) {
-    console.error("Error fetching stories:", error);
     return {
       props: { storyItems: [], totalPages: 1, page: 1, homeContent: homeData },
     };
@@ -115,58 +105,12 @@ export default function ImpactStories({
         </div>
       </section>
 
-      {/* Filters */}
-      {/* <section className="py-8 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex items-center">
-              <Filter className="h-5 w-5 mr-2" />
-              <h2 className="text-lg font-medium">Filter Stories</h2>
-            </div>
-            <div className="w-full md:w-auto">
-              <Tabs defaultValue="category" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="category">By Category</TabsTrigger>
-                  <TabsTrigger value="location">By Location</TabsTrigger>
-                </TabsList>
-                <TabsContent value="category" className="mt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <Button
-                        key={category}
-                        variant={category === "All" ? "default" : "outline"}
-                        size="sm"
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="location" className="mt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {locations.map((location) => (
-                      <Button
-                        key={location}
-                        variant={location === "All" ? "default" : "outline"}
-                        size="sm"
-                      >
-                        {location}
-                      </Button>
-                    ))}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* Stories Grid */}
       <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {storyItems.map((story) => (
-              <Card key={story.id} className="overflow-hidden">
+              <Card key={story.slug} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
                     src={`${BASE_URL}${story.image}`}
@@ -189,7 +133,7 @@ export default function ImpactStories({
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">
-                    <Link href={`/impact-stories/${story.id}`}>
+                    <Link href={`/impact-stories/${story.slug}`}>
                       Read Full Story <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -241,9 +185,9 @@ export default function ImpactStories({
             Your support enables us to continue making a positive impact in
             communities around the world.
           </p>
-          <Button asChild size="lg">
+          {/* <Button asChild size="lg">
             <Link href="/donate">Donate Now</Link>
-          </Button>
+          </Button> */}
         </div>
       </section>
     </div>

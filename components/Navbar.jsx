@@ -72,9 +72,9 @@ const Navbar = () => {
                 )}
               </Button>
             )}
-            <Button asChild className="ml-4" variant="default">
+            {/* <Button asChild className="ml-4" variant="default">
               <Link href="/donate">Donate Now</Link>
-            </Button>
+            </Button> */}
           </div>
 
           {/* Mobile menu button */}
@@ -119,11 +119,11 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Button asChild className="w-full mt-4" variant="default">
+            {/* <Button asChild className="w-full mt-4" variant="default">
               <Link href="/donate" onClick={() => setIsOpen(false)}>
                 Donate Now
               </Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
       )}

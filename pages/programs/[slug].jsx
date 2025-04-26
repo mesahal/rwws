@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,18 +13,33 @@ import {
   MapPin,
   Target,
 } from "lucide-react";
-import { getById } from "@/lib/api";
+import { getAll, getById } from "@/lib/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
 export async function getStaticPaths() {
   try {
-    const response = await getAll(1, 6, "program");
-    const data = response.data;
-    const items = data.programList;
+    let allPrograms = [];
+    let page = 1;
+    let hasMore = true;
 
-    const paths = items.map((item) => ({
-      params: { id: String(item.id) },
+    // Fetch all pages of programs
+    while (hasMore) {
+      const response = await getAll(page, 100, "program");
+      const data = response.data;
+      allPrograms = [...allPrograms, ...data.programList];
+      hasMore = data.programList.length === 100;
+      page++;
+    }
+
+    // Generate paths with slugs
+    const paths = allPrograms.map((item) => ({
+      params: {
+        slug: item.title
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
+      },
     }));
 
     return { paths, fallback: "blocking" };
@@ -48,12 +64,35 @@ const getEmbedUrl = (url) => {
 
 export async function getStaticProps({ params }) {
   try {
-    const response = await getById("program", params.id);
-    if (!response.success) return { notFound: true };
+    let allPrograms = [];
+    let page = 1;
+    let hasMore = true;
 
+    // Fetch all programs to find matching slug
+    while (hasMore) {
+      const response = await getAll(page, 100, "program");
+      const data = response.data;
+      allPrograms = [...allPrograms, ...data.programList];
+      hasMore = data.programList.length === 100;
+      page++;
+    }
+
+    // Find program by slug
+    const program = allPrograms.find((item) => {
+      const itemSlug = item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+      return itemSlug === params.slug;
+    });
+
+    if (!program) return { notFound: true };
+
+    // Get full details using the found ID
+    const response = await getById("program", program.id);
     return {
       props: { program: response.data },
-      revalidate: 86400, // 1 day
+      revalidate: 86400, // Keep existing revalidation
     };
   } catch (error) {
     return { notFound: true };
@@ -215,12 +254,12 @@ export default function ProgramDetailPage({ program }) {
                   <p className="mb-6">
                     Your contribution helps us continue this important work.
                   </p>
-                  <Button
+                  {/* <Button
                     asChild
                     className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
                   >
                     <Link href="/donate">Donate Now</Link>
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
 

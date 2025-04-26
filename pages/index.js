@@ -32,21 +32,29 @@ export async function getStaticProps() {
     const programContent = await getAll(page, pageSize, "program");
     const newsContent = await getAll(page, pageSize, "news");
 
+    // Add slug generation to all items
+    const withSlugs = (items) =>
+      items.map((item) => ({
+        ...item,
+        slug: item.title
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
+      }));
+
     return {
       props: {
         homeContent: homeData.content[0] || null,
-        programs: programContent.data.programList,
-        impactStories: storyContent.data.storyList,
-        newsItems: newsContent.data.newsList,
+        programs: withSlugs(programContent.data.programList),
+        impactStories: withSlugs(storyContent.data.storyList),
+        newsItems: withSlugs(newsContent.data.newsList),
       },
-      revalidate: 3600, // ISR revalidation
+      revalidate: 3600,
     };
   } catch (error) {
     console.error("Error in getStaticProps:", error);
     return {
-      props: {
-        homeContent: null,
-      },
+      props: { homeContent: null },
     };
   }
 }
@@ -104,7 +112,7 @@ export default function Home({
             </h1>
             <p className="text-xl md:text-2xl mb-8">{homeContent.cta_text}</p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
+              {/* <Button
                 asChild
                 size="lg"
                 className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
@@ -118,7 +126,7 @@ export default function Home({
                 className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
               >
                 <Link href="/apply-for-aid">Apply for Aid</Link>
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -181,7 +189,7 @@ export default function Home({
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">
-                    <Link href={`/impact-stories/${story.id}`}>
+                    <Link href={`/impact-stories/${story.slug}`}>
                       Read Full Story <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -231,7 +239,7 @@ export default function Home({
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">
-                    <Link href={`/news/${item.id}`}>
+                    <Link href={`/news/${item.slug}`}>
                       Read More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -274,7 +282,7 @@ export default function Home({
                 </CardContent>
                 <CardFooter className="justify-center">
                   <Button asChild variant="ghost">
-                    <Link href={`/programs/${program.id}`}>
+                    <Link href={`/programs/${program.slug}`}>
                       Learn More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -352,7 +360,7 @@ export default function Home({
             many ways to get involved with RWWS.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button
+            {/* <Button
               asChild
               size="lg"
               className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
@@ -366,7 +374,7 @@ export default function Home({
               className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
             >
               <Link href="/apply-for-aid">Apply for Aid</Link>
-            </Button>
+            </Button> */}
             <Button
               asChild
               size="lg"

@@ -93,7 +93,7 @@ const Footer = () => {
               Get Involved
             </h3>
             <ul className="mt-4 space-y-2">
-              <li>
+              {/* <li>
                 <Link
                   href="/donate"
                   className="text-muted-foreground hover:text-primary"
@@ -108,7 +108,7 @@ const Footer = () => {
                 >
                   Apply for Aid
                 </Link>
-              </li>
+              </li> */}
               {/* <li>
                 <Link
                   href="/events"

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -30,40 +30,65 @@ const formatDate = (isoString) => {
 
 export async function getStaticPaths() {
   try {
-    const response = await getAll(1, 6, "news");
-    const data = response.data;
-    const items = data.newsList;
-    if (!data || items.length === 0) {
-      console.warn("No news items found.");
-      return { paths: [], fallback: true };
+    let allNews = [];
+    let page = 1;
+    let hasMore = true;
+
+    // Fetch all pages of news
+    while (hasMore) {
+      const response = await getAll(page, 100, "news");
+      const data = response.data;
+      allNews = [...allNews, ...data.newsList];
+      hasMore = data.newsList.length === 100;
+      page++;
     }
 
-    const paths = items.map((item) => ({
-      params: { id: String(item.id) },
+    // Generate paths with slugs
+    const paths = allNews.map((item) => ({
+      params: {
+        slug: item.title
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
+      },
     }));
 
     return { paths, fallback: "blocking" };
   } catch (error) {
-    console.error("Error generating static paths:", error);
     return { paths: [], fallback: true };
   }
 }
 
 export async function getStaticProps({ params }) {
-  if (!params?.id) {
-    return { notFound: true };
-  }
-
   try {
-    const response = await getById("news", params.id);
-    const newsItem = response.data;
-    if (!newsItem) {
-      return { notFound: true };
+    let allNews = [];
+    let page = 1;
+    let hasMore = true;
+
+    // Fetch all news to find matching slug
+    while (hasMore) {
+      const response = await getAll(page, 100, "news");
+      const data = response.data;
+      allNews = [...allNews, ...data.newsList];
+      hasMore = data.newsList.length === 100;
+      page++;
     }
 
-    return { props: { newsItem } };
+    // Find item by slug
+    const newsItem = allNews.find((item) => {
+      const itemSlug = item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+      return itemSlug === params.slug;
+    });
+
+    if (!newsItem) return { notFound: true };
+
+    // Get full details using the found ID
+    const response = await getById("news", newsItem.id);
+    return { props: { newsItem: response.data } };
   } catch (error) {
-    console.error("Error fetching news item:", error);
     return { notFound: true };
   }
 }
@@ -165,12 +190,12 @@ export default function NewsDetailPage({ newsItem }) {
                     Your donation helps us continue making a difference in
                     communities worldwide.
                   </p>
-                  <Button
+                  {/* <Button
                     asChild
                     className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
                   >
                     <Link href="/donate">Donate Now</Link>
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
 

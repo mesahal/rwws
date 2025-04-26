@@ -43,12 +43,20 @@ export async function getStaticProps() {
   const page = 1;
   try {
     const homeData = await getHome(1, 10);
-
     const response = await getAll(page, pageSize, "news");
     const { newsList, total_count } = response.data; // ✅ Correct Destructuring
+    // Add slug generation
+    const newsWithSlugs = newsList.map((item) => ({
+      ...item,
+      slug: item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, ""),
+    }));
+
     return {
       props: {
-        newsItems: newsList,
+        newsItems: newsWithSlugs,
         totalPages: Math.ceil(total_count / pageSize),
         page,
         homeContent: homeData.content[0] || null,
@@ -93,50 +101,6 @@ export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
         </div>
       </section>
 
-      {/* Search and Filters */}
-      {/* <section className="py-8 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="w-full md:w-1/3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search news..." className="pl-10" />
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <div className="w-full sm:w-auto">
-                <Select defaultValue="All Categories">
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-full sm:w-auto">
-                <Select defaultValue="All Years">
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
       {/* News Grid */}
       <section className="py-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -174,7 +138,7 @@ export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
                       </p>
                     </div>
                     <Button asChild>
-                      <Link href={`/news/${newsItems[0].id}`}>
+                      <Link href={`/news/${newsItems[0].slug}`}>
                         Read Full Article{" "}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
@@ -188,7 +152,7 @@ export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
           {/* News Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {newsItems.map((item) => (
-              <Card key={item.id} className="overflow-hidden">
+              <Card key={item.slug} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
                     src={`${BASE_URL}${item.image}`}
@@ -216,7 +180,7 @@ export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">
-                    <Link href={`/news/${item.id}`}>
+                    <Link href={`/news/${item.slug}`}>
                       Read More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -256,25 +220,6 @@ export default function NewsPage({ newsItems, totalPages, page, homeContent }) {
           </div>
         </div>
       </section>
-
-      {/* Newsletter Signup */}
-      {/* <section className="py-16 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Stay Updated</h2>
-          <p className="text-lg mb-8 max-w-3xl mx-auto">
-            Subscribe to our newsletter to receive the latest news and updates
-            directly in your inbox.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <Input
-              placeholder="Your email address"
-              type="email"
-              className="flex-grow"
-            />
-            <Button>Subscribe</Button>
-          </div>
-        </div>
-      </section> */}
     </div>
   );
 }

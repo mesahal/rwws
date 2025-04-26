@@ -14,8 +14,8 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react";
-import { getById } from "@/lib/api";
-import { useRouter } from "next/router";
+import { getAll, getById } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_IMAGE_URL;
 
@@ -29,21 +29,29 @@ const formatDate = (isoString) => {
 };
 export async function getStaticPaths() {
   try {
-    const response = await getAll(1, 6, "story"); // Fetch first 100 stories for paths
-    const data = response.data;
-    const items = data.storyList;
+    let allStories = [];
+    let page = 1;
+    let hasMore = true;
 
-    if (!data || items.length === 0) {
-      return { paths: [], fallback: true };
+    while (hasMore) {
+      const response = await getAll(page, 100, "story");
+      const data = response.data;
+      allStories = [...allStories, ...data.storyList];
+      hasMore = data.storyList.length === 100;
+      page++;
     }
 
-    const paths = items.map((item) => ({
-      params: { id: String(item.id) },
+    const paths = allStories.map((item) => ({
+      params: {
+        slug: item.title
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
+      },
     }));
 
     return { paths, fallback: "blocking" };
   } catch (error) {
-    console.error("Error generating static paths:", error);
     return { paths: [], fallback: true };
   }
 }
@@ -63,24 +71,35 @@ const getEmbedUrl = (url) => {
 };
 
 export async function getStaticProps({ params }) {
-  if (!params?.id) {
-    return { notFound: true };
-  }
-
   try {
-    const response = await getById("story", params.id);
-    if (!response.success || !response.data) {
-      return { notFound: true };
+    let allStories = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await getAll(page, 100, "story");
+      const data = response.data;
+      allStories = [...allStories, ...data.storyList];
+      hasMore = data.storyList.length === 100;
+      page++;
     }
 
+    const storyItem = allStories.find((item) => {
+      const itemSlug = item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+      return itemSlug === params.slug;
+    });
+
+    if (!storyItem) return { notFound: true };
+
+    const response = await getById("story", storyItem.id);
     return {
-      props: {
-        storyItem: response.data,
-      },
-      revalidate: 86400, // Regenerate daily (60*60*24)
+      props: { storyItem: response.data },
+      revalidate: 86400,
     };
   } catch (error) {
-    console.error("Error fetching story item:", error);
     return { notFound: true };
   }
 }
@@ -205,12 +224,12 @@ export default function ImpactStoryDetail({ storyItem }) {
                     Your donation helps us continue making a difference in
                     communities worldwide.
                   </p>
-                  <Button
+                  {/* <Button
                     asChild
                     className="bg-white hover:bg-gray-100 text-primary dark:bg-black dark:text-primary"
                   >
                     <Link href="/donate">Donate Now</Link>
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             </div>

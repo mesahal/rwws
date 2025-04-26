@@ -40,24 +40,29 @@ const formatDate = (isoString) => {
 
 const pageSize = 6;
 
-export async function getServerSideProps(context) {
-  try {
-    // Get page number from query parameters, default to 1
-    const page = parseInt(context.query.page) || 1;
-    const validPage = Math.max(1, page);
+export async function getStaticProps() {
+  const page = 1;
 
+  try {
     // Fetch home data
     const homeData = await getHome(1, 10);
 
     // Fetch programs data with pagination
-    const response = await getAll(validPage, pageSize, "program");
+    const response = await getAll(page, pageSize, "program");
     const { programList, total_count } = response.data;
-
+    // Add slug generation
+    const programsWithSlugs = programList.map((item) => ({
+      ...item,
+      slug: item.title
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, ""),
+    }));
     return {
       props: {
-        programs: programList || [],
+        programs: programsWithSlugs || [],
         totalPages: Math.ceil(total_count / pageSize) || 1,
-        page: validPage,
+        page,
         homeContent: homeData?.content?.[0] || null,
       },
     };
@@ -68,7 +73,7 @@ export async function getServerSideProps(context) {
         programs: [],
         totalPages: 1,
         page: 1,
-        homeContent: null,
+        homeContent: homeData,
       },
     };
   }
@@ -142,7 +147,7 @@ export default function ProgramsPage({
                       </p>
                     </div>
                     <Button asChild>
-                      <Link href={`/programs/${programs[0].id}`}>
+                      <Link href={`/programs/${programs[0].slug}`}>
                         Learn More <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
@@ -155,7 +160,7 @@ export default function ProgramsPage({
           {/* Programs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {programs.map((program) => (
-              <Card key={program.id} className="overflow-hidden">
+              <Card key={program.slug} className="overflow-hidden">
                 <div className="relative h-48">
                   <Image
                     src={`${BASE_URL}${program.image}`}
@@ -183,7 +188,7 @@ export default function ProgramsPage({
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="w-full">
-                    <Link href={`/programs/${program.id}`}>
+                    <Link href={`/programs/${program.slug}`}>
                       Learn More <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "../layout";
 import { title } from "process";
+import { auth } from "@/lib/auth";
 
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -47,6 +48,20 @@ const formatDate = (isoString) => {
     month: "long",
     day: "numeric",
   });
+};
+
+const checkAuth = async () => {
+  try {
+    const isValid = await auth.checkTokenExpiry();
+    if (!isValid) {
+      auth.logout();
+      return false;
+    }
+    return true;
+  } catch (error) {
+    auth.logout();
+    return false;
+  }
 };
 
 export default function ContentManagement() {
@@ -92,7 +107,29 @@ export default function ContentManagement() {
       icon: <Home className="h-4 w-4 mr-2" />,
     },
   };
-
+  const requiredFieldsByType = {
+    news: ["title", "excerpt", "image"],
+    story: ["title", "excerpt", "content", "location", "video", "image"],
+    program: [
+      "title",
+      "description",
+      "longDescription",
+      "goals",
+      "achievements",
+      "locations",
+      "status",
+      "start_date",
+    ],
+    home: [
+      "hero_headline",
+      "cta_text",
+      "mission",
+      "vision",
+      "hero_image",
+      "images",
+      "videos",
+    ],
+  };
   useEffect(() => {
     fetchContent();
   }, [currentPage, activeTab]);
@@ -170,7 +207,7 @@ export default function ContentManagement() {
       case "home":
         typeSpecificData = {
           hero_headline: formData.hero_headline,
-          hero_text: formData.hero_text,
+          cta_text: formData.cta_text,
           mission: formData.mission,
           vision: formData.vision,
           video_urls: formData.videos,
@@ -202,8 +239,8 @@ export default function ContentManagement() {
 
   const validateForm = () => {
     const requiredFields = {
-      news: ["title", "excerpt"],
-      story: ["title", "excerpt", "content", "location", "video"],
+      news: ["title", "excerpt", "image"],
+      story: ["title", "excerpt", "content", "location", "video", "image"],
       program: [
         "title",
         "description",
@@ -217,7 +254,7 @@ export default function ContentManagement() {
       ],
       home: [
         "hero_headline",
-        "hero_text",
+        "cta_text",
         "mission",
         "vision",
         "hero_image",
@@ -387,7 +424,12 @@ export default function ContentManagement() {
         return (
           <>
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title{" "}
+                {requiredFieldsByType[activeTab].includes("title") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -398,7 +440,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="excerpt">Content</Label>
+              <Label htmlFor="excerpt">
+                Content{" "}
+                {requiredFieldsByType[activeTab].includes("excerpt") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
@@ -432,7 +479,12 @@ export default function ContentManagement() {
               </Select>
             </div> */}
             <div>
-              <Label htmlFor="image">Image</Label>
+              <Label htmlFor="image">
+                Image{" "}
+                {requiredFieldsByType[activeTab].includes("image") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="image"
                 type="file"
@@ -452,7 +504,12 @@ export default function ContentManagement() {
         return (
           <>
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title{" "}
+                {requiredFieldsByType[activeTab].includes("title") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -463,7 +520,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="excerpt">Short Descrption</Label>
+              <Label htmlFor="excerpt">
+                Excerpt{" "}
+                {requiredFieldsByType[activeTab].includes("excerpt") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="excerpt"
                 value={formData.excerpt}
@@ -474,7 +536,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content">
+                Content{" "}
+                {requiredFieldsByType[activeTab].includes("content") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="content"
                 value={formData.content}
@@ -509,7 +576,12 @@ export default function ContentManagement() {
               </Select>
             </div> */}
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">
+                Location{" "}
+                {requiredFieldsByType[activeTab].includes("location") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="location"
                 value={formData.location}
@@ -520,7 +592,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="video">Video URL</Label>
+              <Label htmlFor="video">
+                Video URL{" "}
+                {requiredFieldsByType[activeTab].includes("video") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="video"
                 value={formData.video}
@@ -531,7 +608,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="image">Image</Label>
+              <Label htmlFor="image">
+                Image{" "}
+                {requiredFieldsByType[activeTab].includes("image") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="image"
                 type="file"
@@ -551,7 +633,12 @@ export default function ContentManagement() {
         return (
           <>
             <div>
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title{" "}
+                {requiredFieldsByType[activeTab].includes("title") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -562,7 +649,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="description">Short Description</Label>
+              <Label htmlFor="description">
+                Short Description{" "}
+                {requiredFieldsByType[activeTab].includes("description") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -573,7 +665,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="longDescription">Long Description</Label>
+              <Label htmlFor="longDescription">
+                Long Description{" "}
+                {requiredFieldsByType[activeTab].includes(
+                  "longDescription"
+                ) && <span className="text-red-500">*</span>}
+              </Label>
               <Textarea
                 id="longDescription"
                 value={formData.longDescription}
@@ -608,7 +705,12 @@ export default function ContentManagement() {
               </Select>
             </div> */}
             <div>
-              <Label htmlFor="goals">Goals</Label>
+              <Label htmlFor="goals">
+                Goals{" "}
+                {requiredFieldsByType[activeTab].includes("goals") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="goals"
                 value={formData.goals?.join("\n")}
@@ -622,7 +724,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="achievements">Achievements</Label>
+              <Label htmlFor="achievements">
+                Achievements{" "}
+                {requiredFieldsByType[activeTab].includes("achievements") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="achievements"
                 value={formData.achievements?.join("\n")}
@@ -636,7 +743,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="locations">Locations</Label>
+              <Label htmlFor="locations">
+                Locations{" "}
+                {requiredFieldsByType[activeTab].includes("locations") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="locations"
                 value={formData.locations?.join("\n")}
@@ -650,7 +762,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="video">Video URL</Label>
+              <Label htmlFor="video">
+                Video URL{" "}
+                {requiredFieldsByType[activeTab].includes("video") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="video"
                 value={formData.video}
@@ -661,7 +778,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="status">Status</Label>
+              <Label htmlFor="status">
+                Status{" "}
+                {requiredFieldsByType[activeTab].includes("status") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) =>
@@ -674,12 +796,17 @@ export default function ContentManagement() {
                 <SelectContent>
                   <SelectItem value="Ongoing">Ongoing</SelectItem>
                   <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="Planned">Planned</SelectItem>
+                  <SelectItem value="Proposed">Proposed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="start_date">Start Date</Label>
+              <Label htmlFor="start_date">
+                Start Date{" "}
+                {requiredFieldsByType[activeTab].includes("start_date") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="start_date"
                 type="date"
@@ -690,7 +817,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="image">Image</Label>
+              <Label htmlFor="image">
+                Image{" "}
+                {requiredFieldsByType[activeTab].includes("image") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="image"
                 type="file"
@@ -710,7 +842,12 @@ export default function ContentManagement() {
         return (
           <>
             <div>
-              <Label htmlFor="hero_headline">Hero Headline</Label>
+              <Label htmlFor="hero_headline">
+                Hero Headline{" "}
+                {requiredFieldsByType[activeTab].includes("hero_headline") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 id="hero_headline"
                 value={formData.hero_headline}
@@ -720,17 +857,27 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="hero_text">Hero Text</Label>
+              <Label htmlFor="cta_text">
+                CTA Text{" "}
+                {requiredFieldsByType[activeTab].includes("cta_text") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
-                id="hero_text"
-                value={formData.hero_text}
+                id="cta_text"
+                value={formData.cta_text}
                 onChange={(e) =>
-                  setFormData({ ...formData, hero_text: e.target.value })
+                  setFormData({ ...formData, cta_text: e.target.value })
                 }
               />
             </div>
             <div>
-              <Label htmlFor="mission">Mission Statement</Label>
+              <Label htmlFor="mission">
+                Mission Statement{" "}
+                {requiredFieldsByType[activeTab].includes("mission") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="mission"
                 value={formData.mission}
@@ -741,7 +888,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="vision">Vision Statement</Label>
+              <Label htmlFor="vision">
+                Vision Statement{" "}
+                {requiredFieldsByType[activeTab].includes("vision") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Textarea
                 id="vision"
                 value={formData.vision}
@@ -752,7 +904,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="hero_image">Hero Image</Label>
+              <Label htmlFor="hero_image">
+                Hero Image{" "}
+                {requiredFieldsByType[activeTab].includes("hero_image") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 type="file"
                 accept="image/*"
@@ -765,7 +922,12 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label>Mission Vission Images</Label>
+              <Label htmlFor="images">
+                Mission Vission Images{" "}
+                {requiredFieldsByType[activeTab].includes("images") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
               <Input
                 type="file"
                 multiple
@@ -779,20 +941,42 @@ export default function ContentManagement() {
               />
             </div>
             <div>
-              <Label className="mr-2">Videos</Label>
-              {formData.videos?.map((video, index) => (
-                <Input
-                  key={index}
-                  value={video}
-                  className="mb-2"
-                  onChange={(e) => {
-                    const newVideos = [...formData.videos];
-                    newVideos[index] = e.target.value;
-                    setFormData({ ...formData, videos: newVideos });
-                  }}
-                />
-              ))}
+              <Label className="mr-2">
+                Videos{" "}
+                {requiredFieldsByType[activeTab].includes("videos") && (
+                  <span className="text-red-500">*</span>
+                )}
+              </Label>
+              <div className="space-y-2">
+                {formData.videos?.map((video, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <Input
+                      value={video}
+                      className="flex-1"
+                      onChange={(e) => {
+                        const newVideos = [...formData.videos];
+                        newVideos[index] = e.target.value;
+                        setFormData({ ...formData, videos: newVideos });
+                      }}
+                      placeholder="Enter video URL"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        const newVideos = formData.videos.filter(
+                          (_, i) => i !== index
+                        );
+                        setFormData({ ...formData, videos: newVideos });
+                      }}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
               <Button
+                className="mt-2"
                 onClick={() =>
                   setFormData({
                     ...formData,
@@ -850,11 +1034,17 @@ export default function ContentManagement() {
             }}
           >
             <DialogTrigger asChild>
-              <Button>
+              <Button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  if (!(await checkAuth())) return;
+                  setIsCreateDialogOpen(true);
+                }}
+              >
                 <Plus className="h-4 w-4 mr-2" /> Create New
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[90vh] flex flex-col">
+            <DialogContent className="max-w-[1200px] w-full max-h-[90vh] flex flex-col">
               <DialogHeader>
                 <DialogTitle>
                   Create {contentTypes[activeTab].title}
@@ -885,25 +1075,35 @@ export default function ContentManagement() {
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList>
-            <TabsTrigger value="home" className="text-2xl">
-              <Home className="h-5 w-5 mr-2" /> Home
+          <TabsList className="flex w-full overflow-x-auto md:overflow-visible">
+            <TabsTrigger
+              value="home"
+              className="text-sm sm:text-base px-2 sm:px-4 flex items-center whitespace-nowrap"
+            >
+              <Home className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Home</span>
             </TabsTrigger>
-            <TabsTrigger value="news" className="text-2xl">
-              <Newspaper className="h-5 w-5 mr-2" /> News
+            <TabsTrigger
+              value="news"
+              className="text-sm sm:text-base px-2 sm:px-4 flex items-center whitespace-nowrap"
+            >
+              <Newspaper className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">News</span>
             </TabsTrigger>
-            {/* <TabsTrigger value="blogs">
-              <FileText className="h-4 w-4 mr-2" /> Blogs
-            </TabsTrigger> */}
-            <TabsTrigger value="program" className="text-2xl">
-              <BookOpen className="h-5 w-5 mr-2" /> Programs
+            <TabsTrigger
+              value="program"
+              className="text-sm sm:text-base px-2 sm:px-4 flex items-center whitespace-nowrap"
+            >
+              <BookOpen className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Programs</span>
             </TabsTrigger>
-            <TabsTrigger value="story" className="text-2xl">
-              <Heart className="h-5 w-5 mr-2" /> Impact Stories
+            <TabsTrigger
+              value="story"
+              className="text-sm sm:text-base px-2 sm:px-4 flex items-center whitespace-nowrap"
+            >
+              <Heart className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Stories</span>
             </TabsTrigger>
-            {/* <TabsTrigger value="reports">
-              <FileSpreadsheet className="h-4 w-4 mr-2" /> Reports
-            </TabsTrigger> */}
           </TabsList>
 
           {Object.keys(contentTypes).map((type) => (
@@ -965,14 +1165,20 @@ export default function ContentManagement() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleEdit(item)}
+                                  onClick={async () => {
+                                    if (!(await checkAuth())) return;
+                                    handleEdit(item);
+                                  }}
                                 >
                                   <Edit className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleDelete(item.id)}
+                                  onClick={async () => {
+                                    if (!(await checkAuth())) return;
+                                    handleDelete(item.id);
+                                  }}
                                 >
                                   <Trash className="h-4 w-4" />
                                 </Button>
@@ -989,7 +1195,10 @@ export default function ContentManagement() {
                       variant="outline"
                       size="sm"
                       disabled={currentPage === 1}
-                      onClick={() => setCurrentPage((prev) => prev - 1)}
+                      onClick={async () => {
+                        if (!(await checkAuth())) return;
+                        setCurrentPage((prev) => prev - 1);
+                      }}
                     >
                       Previous
                     </Button>
@@ -997,7 +1206,10 @@ export default function ContentManagement() {
                       variant="outline"
                       size="sm"
                       disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      onClick={async () => {
+                        if (!(await checkAuth())) return;
+                        setCurrentPage((prev) => prev + 1);
+                      }}
                     >
                       Next
                     </Button>
@@ -1019,7 +1231,7 @@ export default function ContentManagement() {
             }
           }}
         >
-          <DialogContent className="max-h-[90vh] flex flex-col">
+          <DialogContent className="max-w-[1200px] w-full max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>Edit {contentTypes[activeTab].title}</DialogTitle>
             </DialogHeader>
