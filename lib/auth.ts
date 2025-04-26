@@ -129,8 +129,12 @@ export const auth = {
   },
 
   async checkTokenExpiry(): Promise<boolean> {
-    const tokenExpiry = localStorage.getItem("tokenExpiry");
-    if (!tokenExpiry) {
+    // First check cookies
+    const accessToken = this.getAccessToken();
+    const tokenExpiry =
+      getCookie("tokenExpiry") || localStorage.getItem("tokenExpiry");
+
+    if (!accessToken || !tokenExpiry) {
       this.logout();
       return false;
     }
@@ -141,7 +145,6 @@ export const auth = {
     if (currentTime >= expiryTime) {
       return this.refreshToken();
     }
-
     return true;
   },
 
