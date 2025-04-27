@@ -28,7 +28,7 @@ import { toast } from "@/hooks/use-toast";
 
 const AdminLayout = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
@@ -228,16 +228,15 @@ const AdminLayout = ({ children }) => {
                 </div>
               </DialogContent>
             </Dialog>
+            <Button
+              variant="ghost"
+              className="flex items-center justify-start px-3 py-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5 mr-3" />
+              Logout
+            </Button>
           </nav>
-
-          <Button
-            variant="ghost"
-            className="flex items-center justify-start px-3 py-2"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </Button>
         </div>
       </aside>
 

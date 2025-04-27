@@ -1105,7 +1105,6 @@ export default function ContentManagement() {
               <span className="hidden sm:inline">Stories</span>
             </TabsTrigger>
           </TabsList>
-
           {Object.keys(contentTypes).map((type) => (
             <TabsContent key={type} value={type}>
               <Card>
@@ -1117,51 +1116,34 @@ export default function ContentManagement() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-3 px-4">Title</th>
-                          {/* <th className="text-left py-3 px-4">Category</th>
-                          <th className="text-left py-3 px-4">Status</th> */}
-                          <th className="text-left py-3 px-4">Date</th>
-                          <th className="text-right py-3 px-4">Actions</th>
+                          <th className="text-left py-3 px-2 sm:px-4 w-[45%]">
+                            Title
+                          </th>
+                          <th className="text-left py-3 px-2 sm:px-4 w-[30%]">
+                            Date
+                          </th>
+                          <th className="text-right py-3 px-2 sm:px-4 w-[25%]">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {contentItems.map((item) => (
                           <tr key={item.id} className="border-b">
-                            {activeTab == "home" ? (
-                              <td className="py-3 px-4">
-                                {item.hero_headline}
-                              </td>
-                            ) : (
-                              <td className="py-3 px-4">{item.title}</td>
-                            )}
-                            {/* <td className="py-3 px-4">{item.category}</td>
-                            <td className="py-3 px-4">{item.title}</td>
-                            {/* <td className="py-3 px-4">{item.category}</td>
-                            <td className="py-3 px-4">
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs ${
-                                  item.status === "published"
-                                    ? "bg-green-100 text-green-800"
-                                    : item.status === "draft"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {item.status}
-                              </span>
-                            </td> */}
-                            <td className="py-3 px-4">
-                              {formatDate(item.updated_at)}
+                            <td className="py-3 px-2 sm:px-4 whitespace-normal align-top">
+                              <div className="break-words max-w-[95%]">
+                                {activeTab === "home"
+                                  ? item.hero_headline
+                                  : item.title}
+                              </div>
                             </td>
-                            <td className="py-3 px-4">
-                              <div className="flex justify-end space-x-2">
-                                {/* <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleView(item)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button> */}
+                            <td className="py-3 px-2 sm:px-4 whitespace-normal align-top">
+                              <div className="break-words">
+                                {formatDate(item.updated_at)}
+                              </div>
+                            </td>
+                            <td className="py-3 px-2 sm:px-4  align-top">
+                              <div className="flex flex-col sm:flex-row justify-end gap-2">
                                 <Button
                                   variant="ghost"
                                   size="icon"
