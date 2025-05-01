@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X, Heart, Sun, Moon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +41,16 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              {/* <Heart className="h-8 w-8 text-primary" /> */}
-              <span className="ml-2 text-xl font-bold">RWWS</span>
+            <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+              <Image
+                src="/logo.png"
+                alt="RWWS Logo"
+                width={40}
+                height={40}
+                className="h-8 w-8 object-contain"
+                priority
+              />
+              <span className="text-xl font-bold">RWWS</span>
             </Link>
           </div>
 

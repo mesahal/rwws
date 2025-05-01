@@ -8,7 +8,9 @@ import {
   Twitter,
   Instagram,
   Linkedin,
+  Youtube,
 } from "lucide-react";
+import Image from "next/image";
 
 const Footer = () => {
   return (
@@ -16,25 +18,51 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center">
-              <Heart className="h-6 w-6 text-primary" />
-              <span className="ml-2 text-lg font-bold">RWWS</span>
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo.png"
+                alt="RWWS Logo"
+                width={32}
+                height={32}
+                className="h-6 w-6 object-contain"
+              />
+              <span className="text-lg font-bold">RWWS</span>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
               Empowering communities and creating lasting change through
               compassion and action.
             </p>
             <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a
+                href="https://web.facebook.com/rwws.2018"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a
+                href="https://x.com/WomenRwws"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary"
+              >
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
-                <Instagram className="h-5 w-5" />
+              <a
+                href="https://www.youtube.com/@rwws-rwwelfaresociety4149"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Youtube className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary">
+              <a
+                href="https://www.linkedin.com/in/rwws-rw-welfare-society-61983a232/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary"
+              >
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
@@ -69,22 +97,6 @@ const Footer = () => {
                   Impact Stories
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  href="/financial-reports"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Financial Reports
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  FAQ
-                </Link>
-              </li> */}
             </ul>
           </div>
 
@@ -93,38 +105,6 @@ const Footer = () => {
               Get Involved
             </h3>
             <ul className="mt-4 space-y-2">
-              {/* <li>
-                <Link
-                  href="/donate"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Donate
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/apply-for-aid"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Apply for Aid
-                </Link>
-              </li> */}
-              {/* <li>
-                <Link
-                  href="/events"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Events
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/blog"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Blog
-                </Link>
-              </li> */}
               <li>
                 <Link
                   href="/contact"
@@ -144,18 +124,18 @@ const Footer = () => {
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-muted-foreground mr-2 mt-0.5" />
                 <span className="text-muted-foreground">
-                  123 Hope Street, Charity City, CC 12345
+                  889/B (Ground Floor) Nur Ahmed Road,
+                  <br />
+                  Jamal Khan, Chittagong
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-muted-foreground">+1 (555) 123-4567</span>
+                <span className="text-muted-foreground">+880-1730 79 4514</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-muted-foreground mr-2" />
-                <span className="text-muted-foreground">
-                  info@hopefoundation.org
-                </span>
+                <span className="text-muted-foreground">rowwsbd@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -167,7 +147,7 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} RWWS. All rights reserved.
             </p>
             <div className="mt-4 md:mt-0 flex space-x-6">
-              <Link
+              {/* <Link
                 href="/privacy-policy"
                 className="text-sm text-muted-foreground hover:text-primary"
               >
@@ -178,7 +158,7 @@ const Footer = () => {
                 className="text-sm text-muted-foreground hover:text-primary"
               >
                 Terms of Service
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
